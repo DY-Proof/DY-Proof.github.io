@@ -1,0 +1,1061 @@
+<!doctype html>
+<!-- DY PROOF · site v1.0.0 · SPDX-FileCopyrightText: 2026 Denis Yermakou -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DY PROOF — Find where your system breaks</title>
+<meta name="description" content="Independent technology diagnostics. We determine the operating limits, failure boundaries and technical constraints of complex systems — and prove them with reproducible evidence.">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<link rel="canonical" href="https://dy-proof.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DY PROOF">
+<meta property="og:title" content="DY PROOF — Find where your system breaks. Before production does.">
+<meta property="og:description" content="Independent technology diagnostics. The operating limits and failure boundaries of complex systems, located and proven with reproducible evidence.">
+<meta property="og:url" content="https://dy-proof.github.io/">
+<meta property="og:image" content="https://dy-proof.github.io/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="DY PROOF — find where your system breaks, before production does. A latency curve crossing its failure boundary.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23000'/%3E%3Ctext x='16' y='19.5' font-family='-apple-system,Helvetica,Arial' font-size='13' font-weight='700' fill='%23f5f5f7' text-anchor='middle'%3EDY%3C/text%3E%3Crect x='9' y='23' width='14' height='2' rx='1' fill='%232dd4ff'/%3E%3C/svg%3E">
+<style>
+/* ─────────────────────────────────────────────────────────────────────────
+   DY PROOF. The house style of AxonOS, AxonOS-BCI, DY Research and the Radar:
+   monochrome, one restrained accent, thin rules, generous space, cards at
+   fourteen pixels of radius. Three state colours appear only where a system
+   is being measured: stable, degraded, failed. Nothing else is coloured.
+   ───────────────────────────────────────────────────────────────────────── */
+:root{
+  --bg:#000;--panel:#0c0c0e;--panel-2:#131316;--panel-3:#1c1c20;
+  --hair:rgba(255,255,255,.08);--hair-2:rgba(255,255,255,.15);
+  --text:#f5f5f7;--text-2:#a1a1a6;--text-3:#86868b;
+  --accent:#2dd4ff;--accent-2:#9be8ff;--signal:#8b7cff;
+  --ok:#34d399;--warn:#ffb340;--fail:#ff453a;
+  --paper:#f5f5f7;--ink:#1d1d1f;--ink-2:#515154;--ink-3:#6e6e73;--ink-hair:rgba(0,0,0,.09);
+  --r:14px;--r-sm:10px;--max:1120px;--measure:760px;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","JetBrains Mono","Roboto Mono",Menlo,Consolas,monospace;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.52 var(--sans);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.skip{position:absolute;left:-999px;top:0}
+.skip:focus{left:16px;top:12px;z-index:30;background:var(--text);color:#000;padding:8px 14px;border-radius:10px}
+.wrap{width:100%;max-width:var(--max);margin:0 auto;padding:0 24px}
+.center{text-align:center}
+.measure{max-width:var(--measure);margin-left:auto;margin-right:auto}
+p{margin:0}
+h1,h2,h3{margin:0;color:var(--text);font-weight:700}
+h1,h2,.subhead{text-wrap:balance}
+.lead,.note{text-wrap:pretty}
+
+/* ── the family bar and the local navigation ───────────────────────────── */
+.family{background:#000;border-bottom:1px solid var(--hair);font-size:12px;letter-spacing:.01em}
+.family .wrap{display:flex;justify-content:center;align-items:center;gap:30px;height:34px;
+  overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.family .wrap::-webkit-scrollbar{display:none}
+.family a{color:var(--text-3);flex:none}
+.family a:hover{color:var(--text);text-decoration:none}
+.family a[aria-current="page"]{color:var(--text)}
+.family a[href*="axonos-community-radar"]::before{content:"";display:inline-block;width:6px;height:6px;margin-right:7px;border-radius:50%;
+  background:var(--ok);vertical-align:1px;animation:live 2.4s ease-out infinite}
+@keyframes live{0%{box-shadow:0 0 0 0 rgba(52,211,153,.55)}70%,100%{box-shadow:0 0 0 7px rgba(52,211,153,0)}}
+.nav{position:sticky;top:0;z-index:20;height:52px;background:rgba(0,0,0,.74);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--hair)}
+.nav .wrap{height:52px;display:flex;align-items:center;justify-content:space-between}
+.brand{color:var(--text);font-weight:700;font-size:16px;letter-spacing:.02em;white-space:nowrap}
+.brand:hover{text-decoration:none}
+.nav-links{display:flex;align-items:center;font-size:13px}
+.nav-links > a + a{margin-left:28px}
+.nav-links a{color:var(--text-2);white-space:nowrap}
+.nav-links a:hover{color:var(--text);text-decoration:none}
+.nav-cta{color:#000!important;background:var(--text);border-radius:980px;padding:6px 14px;font-weight:600}
+.nav-cta:hover{background:#fff}
+
+/* ── type ───────────────────────────────────────────────────────────────── */
+.eyebrow{display:block;color:var(--accent);font-size:14px;font-weight:600;letter-spacing:.01em;margin-bottom:14px}
+h1{font-size:clamp(44px,7.2vw,92px);line-height:.98;letter-spacing:-.048em}
+h1 .l2,h2 .l2{display:block}
+h2{font-size:clamp(36px,5.2vw,62px);line-height:1.05;letter-spacing:-.036em}
+h3{font-size:21px;line-height:1.25;letter-spacing:-.02em;font-weight:600}
+.lead{font-size:clamp(19px,2.2vw,24px);line-height:1.42;color:var(--text-2);letter-spacing:-.012em;margin-top:22px}
+.lead b{color:var(--text);font-weight:600}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .grad{background:linear-gradient(95deg,#f5f5f7 5%,var(--accent-2) 55%,var(--accent));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+}
+
+/* ── sections and buttons ──────────────────────────────────────────────── */
+section{padding:clamp(96px,12vw,152px) 0;border-top:1px solid var(--hair);scroll-margin-top:60px}
+section.first{border-top:0}
+.head{margin-bottom:clamp(44px,5.5vw,68px)}
+.actions{display:flex;flex-wrap:wrap;gap:14px 28px;justify-content:center;align-items:center;margin-top:38px}
+.btn{display:inline-block;background:var(--text);color:#000;border-radius:980px;padding:14px 26px;
+  font:600 17px/1.2 var(--sans);letter-spacing:-.01em;white-space:nowrap;border:0;cursor:pointer;
+  transition:background .2s var(--ease),transform .2s var(--ease)}
+.btn:hover{background:#fff;text-decoration:none}
+.btn:active{transform:scale(.98)}
+.more{font-size:17px;font-weight:500;white-space:nowrap}
+.more::after{content:" ›"}
+
+/* ── hero ──────────────────────────────────────────────────────────────── */
+.hero{position:relative;overflow:hidden;padding-top:clamp(84px,11vw,140px)}
+.hero::before{content:"";position:absolute;left:50%;top:-42%;width:1200px;height:960px;transform:translateX(-50%);
+  pointer-events:none;background:radial-gradient(closest-side,rgba(45,212,255,.12),rgba(45,212,255,0))}
+.hero > .wrap{position:relative}
+.caps{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:40px}
+.caps span{font-size:12.5px;color:var(--text-2);border:1px solid var(--hair);border-radius:980px;padding:6px 12px;white-space:nowrap}
+
+/* ── the house band ────────────────────────────────────────────────────
+   The same band as the AxonOS, AxonOS-BCI and DY Research surfaces: eight
+   channels flowing into a boundary, typed events on deterministic time
+   leaving it. Here it reads: controlled load, the boundary, where it breaks. */
+.hband-wrap{margin:clamp(36px,5vw,56px) auto 0;max-width:1120px}
+.hband{display:block;width:100%;height:auto;overflow:visible}
+.hb-tr{fill:none;stroke:#8b7cff;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+.hb-o0{stroke-opacity:.34}.hb-o1{stroke-opacity:.41}.hb-o2{stroke-opacity:.48}.hb-o3{stroke-opacity:.55}
+.hb-flow{animation:hb-scroll 18s linear infinite}
+@keyframes hb-scroll{to{transform:translateX(-690px)}}
+.hb-gate{animation:hb-gate 3.5s ease-in-out infinite}
+@keyframes hb-gate{0%,100%{opacity:.55}50%{opacity:1}}
+.hb-track{stroke:#2dd4ff;stroke-opacity:.18}
+.hb-cap{fill:#2dd4ff;opacity:.4;animation:hb-tick 2.8s cubic-bezier(.4,0,.2,1) infinite}
+.hb-halo{fill:#2dd4ff;opacity:0;animation:hb-halo 2.8s cubic-bezier(.4,0,.2,1) infinite}
+@keyframes hb-tick{0%,100%{opacity:.4}9%{opacity:1}32%{opacity:.4}}
+@keyframes hb-halo{0%,100%{opacity:0}9%{opacity:.22}32%{opacity:0}}
+.hb-l,.hb-m,.hb-r{font-family:var(--mono);font-size:17px;letter-spacing:.02em}
+.hb-l{fill:var(--text-3)}.hb-m{fill:#2dd4ff;fill-opacity:.85}.hb-r{fill:#2dd4ff}
+@media (max-width:640px){.hband-wrap{overflow:hidden;margin-left:-20px;margin-right:-20px}
+  .hband{width:190%;margin-left:-45%}.hb-l,.hb-m,.hb-r{display:none}}
+@supports (animation-timeline: scroll()){@media (prefers-reduced-motion:no-preference){
+  .hero.first h1,.hero.first .lead{animation:hero-out linear both;animation-timeline:scroll(root block);animation-range:0 70vh}
+  @keyframes hero-out{to{opacity:.3;transform:translateY(-32px) scale(.985)}}}}
+
+/* ── the instrument: one workflow, measured as load rises ─────────────── */
+.inst{margin-top:clamp(48px,6vw,72px);background:var(--panel);border:1px solid var(--hair);border-radius:22px;overflow:hidden}
+.inst-top{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 22px;border-bottom:1px solid var(--hair);font-size:13px;color:var(--text-3)}
+.inst-top b{color:var(--text-2);font-weight:600}
+.inst-body{display:grid;grid-template-columns:minmax(0,1fr) 280px}
+.plot{position:relative;padding:52px 22px 16px 58px}
+.canvas{position:relative;aspect-ratio:16/9}
+.canvas svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.zone{opacity:1}
+.grid-l{stroke:rgba(255,255,255,.06);stroke-width:1}
+.budget{stroke:rgba(245,245,247,.45);stroke-width:1.2;stroke-dasharray:5 6}
+.curve{fill:none;stroke:url(#curveG);stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round}
+.curve-ghost{fill:none;stroke:rgba(255,255,255,.07);stroke-width:2;stroke-dasharray:3 6}
+.err{fill:var(--fail);opacity:.55}
+.ylab{position:absolute;left:-46px;transform:translateY(-50%);font:500 11.5px/1 var(--mono);color:var(--text-3);width:38px;text-align:right}
+.xlabs{display:flex;justify-content:space-between;margin-top:10px;font:500 11.5px/1 var(--mono);color:var(--text-3)}
+.xlabs span{width:0;display:flex;justify-content:center}
+.xcap{margin-top:10px;font-size:12.5px;color:var(--text-3);text-align:center}
+.blabel{position:absolute;left:8px;transform:translateY(-135%);font:500 11.5px/1 var(--mono);color:rgba(245,245,247,.6);white-space:nowrap}
+.zl{position:absolute;top:8px;font:600 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;transform:translateX(-50%);white-space:nowrap}
+.zl.s{color:rgba(52,211,153,.75)}.zl.d{color:rgba(255,179,64,.8)}.zl.f{color:rgba(255,69,58,.8)}
+.probe-line{position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.28) 20%,rgba(255,255,255,.28) 80%,rgba(255,255,255,0));transform:translateX(-.5px);pointer-events:none}
+.probe{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#fff;
+  box-shadow:0 0 0 4px rgba(255,255,255,.14),0 0 22px rgba(255,255,255,.35);pointer-events:none;transition:background .2s}
+.probe.up::after{content:"";position:absolute;left:3px;top:-12px;border:4px solid transparent;border-bottom:6px solid #fff}
+.mark{position:absolute;top:-12px;bottom:0;width:2px;margin-left:-1px;background:linear-gradient(180deg,var(--accent),rgba(45,212,255,.25));
+  box-shadow:0 0 18px rgba(45,212,255,.55);opacity:0;transform:scaleY(.2);transform-origin:bottom;transition:opacity .5s var(--ease),transform .7s var(--ease)}
+.mark-tag{position:absolute;top:-40px;left:1px;white-space:nowrap;font:600 12px/1.25 var(--sans);color:var(--accent);
+  background:rgba(0,0,0,.72);border:1px solid rgba(45,212,255,.45);border-radius:980px;padding:5px 10px;opacity:0;transform:translate(-50%,4px);transition:opacity .5s .25s var(--ease),transform .5s .25s var(--ease)}
+.inst.found .mark{opacity:1;transform:none}
+.inst.found .mark-tag{opacity:1;transform:translate(-50%,0)}
+.read{border-left:1px solid var(--hair);display:grid;grid-template-rows:auto repeat(3,1fr)}
+.read > div{padding:18px 22px;border-bottom:1px solid var(--hair);display:flex;flex-direction:column;justify-content:center}
+.read > div:last-child{border-bottom:0}
+.read .k{font-size:12.5px;color:var(--text-3)}
+.read .v{font-size:30px;font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-top:4px;font-variant-numeric:tabular-nums}
+.read .v small{font-size:15px;font-weight:600;color:var(--text-2);margin-left:4px;letter-spacing:0}
+.state{padding:22px!important}
+.state .v{font-size:34px;display:flex;align-items:center;gap:10px}
+.state .dot{width:10px;height:10px;border-radius:50%;flex:none;background:currentColor;box-shadow:0 0 14px currentColor}
+.state .why{font-size:13.5px;color:var(--text-2);margin-top:8px;line-height:1.45;min-height:3.9em}
+.st-stable{color:var(--ok)}.st-degraded{color:var(--warn)}.st-boundary{color:var(--accent)}.st-failure{color:var(--fail)}
+.control{display:flex;align-items:center;gap:18px;padding:16px 22px 18px;border-top:1px solid var(--hair)}
+.control label{font-size:13px;color:var(--text-2);white-space:nowrap}
+.control output{font:600 15px/1 var(--mono);color:var(--text);min-width:2ch;text-align:right}
+.control .replay{appearance:none;border:1px solid var(--hair-2);background:transparent;color:var(--text-2);font:500 13px/1 var(--sans);
+  border-radius:980px;padding:8px 13px;cursor:pointer;white-space:nowrap}
+.control .replay:hover{color:var(--text);background:var(--panel-2)}
+input[type=range]{flex:1;min-width:0;appearance:none;-webkit-appearance:none;background:transparent;height:28px;margin:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;
+  background:linear-gradient(90deg,var(--ok) 0 var(--s1),var(--warn) var(--s1) var(--s2),var(--fail) var(--s2) 100%);opacity:.8}
+input[type=range]::-moz-range-track{height:4px;border-radius:4px;
+  background:linear-gradient(90deg,var(--ok) 0 var(--s1),var(--warn) var(--s1) var(--s2),var(--fail) var(--s2) 100%);opacity:.8}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;margin-top:-10px;border:0;box-shadow:0 2px 10px rgba(0,0,0,.5)}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:0;box-shadow:0 2px 10px rgba(0,0,0,.5)}
+input[type=range]:focus-visible{outline:none}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(45,212,255,.45)}
+input[type=range]:focus-visible::-moz-range-thumb{box-shadow:0 0 0 4px rgba(45,212,255,.45)}
+.inst-foot{font-size:13px;color:var(--text-3);text-align:center;margin-top:18px}
+.closer{font-size:clamp(24px,3vw,34px);font-weight:700;letter-spacing:-.03em;line-height:1.2;text-align:center;margin-top:clamp(64px,8vw,96px);text-wrap:balance}
+.closer span{display:block;color:var(--text-3)}
+
+/* ── three states ──────────────────────────────────────────────────────── */
+.states{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.stc{position:relative;background:var(--panel);border:1px solid var(--hair);border-radius:var(--r);padding:30px 28px 28px;overflow:hidden}
+.stc::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--c)}
+.stc::after{content:"";position:absolute;left:-10%;right:-10%;top:-120px;height:200px;background:radial-gradient(closest-side,var(--g),transparent);pointer-events:none}
+.stc.s{--c:var(--ok);--g:rgba(52,211,153,.09)}.stc.d{--c:var(--warn);--g:rgba(255,179,64,.09)}.stc.f{--c:var(--fail);--g:rgba(255,69,58,.1)}
+.stc .tag{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--c)}
+.stc .tag::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.stc h3{font-size:clamp(26px,2.8vw,32px);letter-spacing:-.03em;margin:14px 0 10px}
+.stc p{color:var(--text-2);font-size:16px;line-height:1.55}
+.stc .sig{margin-top:20px;padding-top:16px;border-top:1px solid var(--hair);font:500 12.5px/1.5 var(--mono);color:var(--text-3)}
+
+/* ── five dimensions converging on one boundary ───────────────────────── */
+.dims{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.dim{background:var(--panel);border:1px solid var(--hair);border-radius:12px;padding:20px 18px 18px}
+.dim h3{font-size:17px;margin-bottom:8px}
+.dim p{font-size:14.5px;color:var(--text-2);line-height:1.5}
+.dim .m{display:block;margin-top:14px;font:500 11.5px/1.45 var(--mono);color:var(--text-3)}
+.converge{display:block;width:100%;height:84px}
+.converge path{fill:none;stroke:url(#convG);stroke-width:1.2;vector-effect:non-scaling-stroke}
+.converge .pulse{stroke:var(--accent);stroke-width:1.6;stroke-dasharray:14 400;animation:conv 3.6s cubic-bezier(.4,0,.2,1) infinite}
+@keyframes conv{from{stroke-dashoffset:14}to{stroke-dashoffset:-260}}
+.fb-bar{position:relative;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:26px 30px;border-radius:var(--r);
+  border:1px solid rgba(45,212,255,.5);background:linear-gradient(180deg,rgba(45,212,255,.12),var(--panel) 80%);box-shadow:0 30px 80px -40px rgba(45,212,255,.5)}
+.fb-bar h3{font-size:clamp(24px,2.8vw,32px);letter-spacing:-.03em;color:var(--text)}
+.fb-bar p{font-size:15.5px;color:var(--text-2);max-width:520px;line-height:1.5}
+.fb-bar .fb-k{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:6px;display:block}
+
+/* ── process ───────────────────────────────────────────────────────────── */
+.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;counter-reset:s;list-style:none;margin:0;padding:0}
+.step{counter-increment:s;position:relative;background:var(--panel);border:1px solid var(--hair);border-radius:12px;padding:22px 18px}
+.step::before{content:counter(s,decimal-leading-zero);display:block;font:600 12px/1 var(--mono);color:var(--accent);letter-spacing:.12em;margin-bottom:16px}
+.step:not(:last-child)::after{content:"";position:absolute;top:28px;right:-14px;width:14px;height:1px;background:linear-gradient(90deg,var(--hair-2),rgba(45,212,255,.6))}
+.step h3{font-size:19px;margin-bottom:8px}
+.step p{font-size:14.5px;color:var(--text-2);line-height:1.5}
+
+/* ── the report, on paper ──────────────────────────────────────────────── */
+section.paper{background:var(--paper);color:var(--ink);border-top:0}
+.paper h2,.paper h3{color:var(--ink)}
+.paper .eyebrow{color:#0b6e8e}
+.paper .lead{color:var(--ink-2)}
+.paper .nots{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 26px;margin-top:22px;font-size:15px;color:var(--ink-3)}
+.paper .nots s{text-decoration-thickness:1px;text-decoration-color:rgba(0,0,0,.35)}
+.doc{max-width:900px;margin:clamp(48px,6vw,72px) auto 0;background:#fff;border:1px solid var(--ink-hair);border-radius:var(--r-sm);
+  box-shadow:0 1px 0 rgba(0,0,0,.02),0 40px 90px -40px rgba(0,0,0,.28);overflow:hidden;color:var(--ink)}
+.doc-h{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;padding:26px 34px 22px;border-bottom:1px solid var(--ink-hair)}
+.doc-h .who{font-weight:700;letter-spacing:.02em;font-size:15px}
+.doc-h .ttl{font-size:13px;color:var(--ink-3);margin-top:4px}
+.doc-h .spec{font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#b3261e;border:1px solid rgba(179,38,30,.4);border-radius:4px;padding:6px 8px;white-space:nowrap}
+.doc-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid var(--ink-hair)}
+.doc-meta div{padding:14px 34px;font-size:13px;color:var(--ink-3)}
+.doc-meta div + div{border-left:1px solid var(--ink-hair)}
+.doc-meta b{display:block;color:var(--ink);font-weight:600;font-size:14px;margin-top:3px}
+.doc-find{padding:28px 34px 8px}
+.doc-find .k{font-size:13px;font-weight:600;color:#0b6e8e}
+.doc-find p{font-size:clamp(19px,2.2vw,23px);line-height:1.38;letter-spacing:-.015em;font-weight:600;margin-top:8px;text-wrap:pretty}
+.strip{padding:66px 34px 28px}
+.strip-bar{position:relative;display:flex;height:12px;border-radius:6px;overflow:visible}
+.strip-bar i{display:block;height:100%}
+.strip-bar i:first-child{border-radius:6px 0 0 6px}.strip-bar i:last-child{border-radius:0 6px 6px 0}
+.strip-bar .ms{position:absolute;top:-8px;bottom:-8px;width:2px;background:var(--ink);margin-left:-1px}
+.strip-leg{position:relative;display:flex;margin-top:12px;font-size:12.5px;color:var(--ink-3)}
+.strip-leg span{display:block}
+.strip-at{position:absolute;top:-44px;transform:translateX(-50%);font:600 12px/1.2 var(--mono);color:var(--ink);white-space:nowrap;text-align:center}
+.doc dl{margin:0;display:grid;grid-template-columns:220px minmax(0,1fr);border-top:1px solid var(--ink-hair)}
+.doc dt,.doc dd{margin:0;padding:15px 34px;border-bottom:1px solid var(--ink-hair);font-size:15px;line-height:1.5}
+.doc dt{color:var(--ink-3);font-weight:500;padding-right:10px}
+.doc dd{color:var(--ink);padding-left:0}
+.doc dd .mono{font:500 13.5px/1.5 var(--mono);color:var(--ink-2)}
+.doc dl > :nth-last-child(-n+2){border-bottom:0}
+.conf{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.conf::before{content:"";width:8px;height:8px;border-radius:50%;background:#1f9d57}
+.doc-f{display:flex;justify-content:space-between;gap:16px;padding:14px 34px;background:#fafafa;border-top:1px solid var(--ink-hair);font-size:12.5px;color:var(--ink-3)}
+.paper .under{font-size:13px;color:var(--ink-3);text-align:center;margin-top:18px}
+
+/* ── engagements ───────────────────────────────────────────────────────── */
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.plan{display:grid;grid-template-rows:auto auto auto auto 1fr auto;background:var(--panel);border:1px solid var(--hair);border-radius:var(--r);
+  padding:34px 30px 30px;position:relative;transition:transform .45s var(--ease),box-shadow .45s var(--ease)}
+.plan.featured{border-color:rgba(45,212,255,.45);background:linear-gradient(180deg,#0b1a20,var(--panel) 40%)}
+.plan .row-top{display:flex;justify-content:space-between;align-items:center;height:26px;margin-bottom:18px}
+.plan .when{font:500 12.5px/1 var(--mono);color:var(--text-3)}
+.plan .badge{font-size:11.5px;font-weight:600;color:var(--accent);border:1px solid rgba(45,212,255,.4);border-radius:980px;padding:5px 10px;white-space:nowrap}
+.plan .name{display:block;font-size:22px;font-weight:700;letter-spacing:-.025em;min-height:28px}
+.plan .price{display:block;font-size:54px;font-weight:700;letter-spacing:-.045em;line-height:1;margin:14px 0 14px;font-variant-numeric:tabular-nums}
+.plan .price small{font-size:22px;letter-spacing:-.02em;color:var(--text-2);margin-right:6px;font-weight:600}
+.plan .q{display:block;font-size:15.5px;line-height:1.45;color:var(--text);min-height:4.4em}
+.plan ul{list-style:none;margin:22px 0 0;padding:22px 0 0;border-top:1px solid var(--hair);align-self:start}
+.plan li{position:relative;padding-left:24px;margin-bottom:11px;font-size:15px;color:var(--text-2);line-height:1.42}
+.plan li::before{content:"";position:absolute;left:1px;top:6px;width:12px;height:7px;border-left:1.8px solid var(--accent);border-bottom:1.8px solid var(--accent);transform:rotate(-45deg)}
+.plan .foot{display:grid;gap:10px;padding-top:26px;align-self:end}
+.plan .btn{display:block;text-align:center;font-size:15px;padding:12px 16px}
+.plan .btn.ghost{background:transparent;color:var(--text);box-shadow:inset 0 0 0 1px var(--hair-2)}
+.plan .btn.ghost:hover{background:var(--panel-2)}
+@media (hover:hover){.plan:hover{transform:translateY(-4px);box-shadow:0 36px 70px -34px rgba(0,0,0,.9)}
+  .plan.featured:hover{box-shadow:0 0 0 1px rgba(45,212,255,.35),0 40px 80px -30px rgba(45,212,255,.28)}}
+.private{margin-top:18px;display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center;padding:30px 34px;border-radius:var(--r);
+  border:1px solid var(--hair);background:linear-gradient(120deg,rgba(139,124,255,.1),var(--panel) 55%)}
+.private .when{font:500 12.5px/1 var(--mono);color:var(--text-3)}
+.private h3{font-size:clamp(24px,2.6vw,30px);letter-spacing:-.03em;margin:10px 0 8px}
+.private p{color:var(--text-2);font-size:16px;line-height:1.5;max-width:640px}
+.private .side{text-align:right}
+.private .side b{display:block;font-size:22px;letter-spacing:-.02em;margin-bottom:12px}
+.private .btn{font-size:15px;padding:12px 20px}
+.terms{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 26px;margin-top:30px;font-size:13.5px;color:var(--text-3)}
+.terms span::before{content:"·";margin-right:10px;color:var(--hair-2)}
+.terms span:first-child::before{content:none}
+
+/* the ladder and the two questions */
+.ladder{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;list-style:none;margin:0 0 18px;padding:0}
+.ladder li{position:relative;padding:0 4px 14px;border-bottom:1px solid var(--hair)}
+.ladder li::after{content:"";position:absolute;left:0;bottom:-1px;height:1px;width:var(--w);background:linear-gradient(90deg,rgba(45,212,255,0),var(--accent))}
+.ladder li:nth-child(1){--w:34%}.ladder li:nth-child(2){--w:66%}.ladder li:nth-child(3){--w:100%}
+.ladder b{display:block;font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.ladder span{display:block;font-size:15px;color:var(--text-2);margin-top:8px}
+.plan li.plus{padding-left:0;color:var(--text-3);font-size:13px;line-height:1.45;margin-top:16px}
+.plan li.plus::before{content:none}
+.subhead{font-size:clamp(24px,2.6vw,30px);font-weight:700;letter-spacing:-.024em;text-align:center;margin:clamp(72px,9vw,104px) 0 30px;color:var(--text)}
+.which{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--hair);border:1px solid var(--hair);border-radius:var(--r);overflow:hidden}
+.which > div{background:var(--panel);padding:30px 30px 26px;display:flex;flex-direction:column}
+.which > div.here{background:linear-gradient(160deg,rgba(45,212,255,.09),var(--panel) 55%)}
+.which .v{font:600 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
+.which .here .v{color:var(--accent)}
+.which h3{font-size:clamp(22px,2.4vw,27px);letter-spacing:-.028em;line-height:1.15;margin:14px 0 10px}
+.which p{font-size:15.5px;color:var(--text-2);line-height:1.5;flex:1}
+.which .ends{display:block;margin-top:18px;padding-top:14px;border-top:1px solid var(--hair);font-size:13.5px;color:var(--text)}
+.which-foot{font-size:14px;color:var(--text-3);text-align:center;margin-top:18px}
+@media (max-width:900px){.ladder{display:none}.which{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:734px){.which > div{padding:24px 22px 22px}}
+
+/* ── investors ─────────────────────────────────────────────────────────── */
+.inv{position:relative;overflow:hidden}
+.inv::before{content:"";position:absolute;left:50%;bottom:-40%;width:1200px;height:760px;transform:translateX(-50%);pointer-events:none;
+  background:radial-gradient(closest-side,rgba(139,124,255,.16),rgba(139,124,255,0))}
+.inv .wrap{position:relative}
+.horizon{position:relative;height:1px;margin:clamp(40px,5vw,60px) auto;max-width:880px;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.22) 20%,rgba(255,255,255,.22) 80%,rgba(255,255,255,0))}
+.horizon::after{content:"";position:absolute;left:68%;top:-14px;width:2px;height:29px;background:var(--accent);box-shadow:0 0 16px rgba(45,212,255,.8)}
+.inv .note{font-size:14px;color:var(--text-3);margin-top:22px}
+
+/* ── principles and plain statements ───────────────────────────────────── */
+.prin{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--hair);border:1px solid var(--hair);border-radius:var(--r);overflow:hidden}
+.prin div{background:var(--panel);padding:26px 22px}
+.prin h3{font-size:19px;margin-bottom:10px}
+.prin p{font-size:14.5px;color:var(--text-2);line-height:1.5}
+.plain{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:18px}
+.plain div{border:1px solid var(--hair);border-radius:var(--r);padding:22px 24px}
+.plain b{display:block;font-size:16px;margin-bottom:6px}
+.plain p{font-size:14.5px;color:var(--text-2);line-height:1.5}
+
+/* ── the family ────────────────────────────────────────────────────────── */
+.stack{max-width:880px;margin:0 auto;display:grid;gap:10px}
+.layer{display:grid;grid-template-columns:120px minmax(0,1fr) auto;align-items:center;gap:22px;padding:22px 26px;border-radius:var(--r);
+  background:var(--panel);border:1px solid var(--hair);color:var(--text);transition:border-color .3s var(--ease),background .3s var(--ease)}
+a.layer:hover{text-decoration:none;border-color:var(--hair-2);background:var(--panel-2)}
+.layer .verb{font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
+.layer b{display:block;font-size:20px;letter-spacing:-.02em}
+.layer span.d{display:block;font-size:14.5px;color:var(--text-2);margin-top:3px;line-height:1.45}
+.layer .go{font-size:13px;color:var(--text-3);white-space:nowrap}
+.layer.here{border-color:rgba(45,212,255,.5);background:linear-gradient(90deg,rgba(45,212,255,.1),var(--panel) 60%)}
+.layer.here .verb,.layer.here .go{color:var(--accent)}
+.layer:nth-child(1){margin:0 42px}.layer:nth-child(2){margin:0 28px}.layer:nth-child(3){margin:0 14px}
+.layer .live{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);margin-right:8px;vertical-align:2px;animation:live 2.4s ease-out infinite}
+.indep{max-width:880px;margin:26px auto 0;display:flex;gap:16px;align-items:flex-start;padding:20px 24px;border:1px solid var(--hair);border-radius:var(--r)}
+.indep b{flex:none;font:600 11px/1.6 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--text)}
+.indep p{font-size:15px;line-height:1.55;color:var(--text-2)}
+
+/* ── closing and footer ───────────────────────────────────────────────── */
+.closing{position:relative;overflow:hidden}
+.closing::before{content:"";position:absolute;left:50%;bottom:-58%;width:1100px;height:820px;transform:translateX(-50%);pointer-events:none;
+  background:radial-gradient(closest-side,rgba(45,212,255,.14),rgba(45,212,255,0))}
+.closing .wrap{position:relative}
+.closing h2{font-size:clamp(56px,9vw,112px);letter-spacing:-.05em;line-height:.98}
+footer{border-top:1px solid var(--hair);padding:56px 0 calc(64px + env(safe-area-inset-bottom));font-size:13px;color:var(--text-3)}
+.fgrid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:28px}
+.fgrid b{display:block;color:var(--text);font-size:13px;margin-bottom:12px;font-weight:600}
+.fgrid a{display:block;color:var(--text-2);margin-bottom:8px}
+.fgrid a:hover{color:var(--text);text-decoration:none}
+.fbrand{color:var(--text);font-size:15px;font-weight:700;letter-spacing:.02em;margin-bottom:8px}
+.fbase{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-top:40px;padding-top:22px;border-top:1px solid var(--hair)}
+
+/* ── the request sheet ─────────────────────────────────────────────────── */
+dialog.sheet{border:1px solid var(--hair-2);border-radius:18px;background:#0e0e11;color:var(--text);padding:0;
+  width:min(620px,calc(100% - 32px));max-height:calc(100% - 48px);box-shadow:0 30px 80px rgba(0,0,0,.6)}
+dialog.sheet::backdrop{background:rgba(0,0,0,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.sheet form{padding:28px 28px 26px;display:grid;gap:18px}
+.sheet-h{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.sheet-h h2{font-size:26px;letter-spacing:-.03em}
+.sheet-h p{font-size:14px;color:var(--text-3);margin-top:6px}
+.x{appearance:none;border:0;background:var(--panel-3);color:var(--text-2);width:32px;height:32px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer;flex:none}
+.x:hover{color:var(--text)}
+.field{display:grid;gap:8px}
+.field > span{font-size:13px;font-weight:600;color:var(--text-2)}
+.field input{height:46px}
+.field input,.field textarea{width:100%;background:#000;color:var(--text);border:1px solid var(--hair-2);border-radius:10px;padding:12px 13px;font:16px/1.4 var(--sans)}
+.field textarea{min-height:92px;resize:vertical}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,212,255,.16)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg label{position:relative;cursor:pointer}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:block;padding:9px 13px;border-radius:980px;border:1px solid var(--hair-2);font-size:14px;color:var(--text-2);white-space:nowrap;transition:all .18s var(--ease)}
+.seg input:checked + span{background:var(--text);color:#000;border-color:var(--text)}
+.seg input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.sheet .send{display:block;width:100%;height:50px;font-size:16px;text-align:center}
+.sheet .small{font-size:12.5px;color:var(--text-3);line-height:1.5;text-align:center}
+.sheet .sent{padding:18px 18px 14px;border:1px solid var(--hair);border-radius:14px;background:rgba(255,255,255,.03)}
+.sheet .sent[hidden]{display:none}
+.sent-h{font-weight:600;color:var(--text);margin:0 0 4px}
+.sent-s{color:var(--text-2);margin:0 0 14px;font-size:15px}
+.sent-ways{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.sent-ways .more{background:none;border:0;font:inherit;font-weight:500;color:var(--accent);cursor:pointer;padding:8px 4px}
+.sent-live{min-height:1.4em;margin:10px 0 0;font-size:14px;color:var(--ok)}
+.sheet.is-sent .send{opacity:.55}
+.offscreen{position:fixed;left:-9999px;top:0;opacity:0}
+
+/* ── mobile dock ───────────────────────────────────────────────────────── */
+.dock{position:fixed;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:25;display:none;text-align:center;
+  background:var(--text);color:#000!important;border-radius:980px;padding:15px;font-weight:600;font-size:16px;box-shadow:0 10px 30px rgba(0,0,0,.5);
+  transform:translateY(140%);transition:transform .25s var(--ease)}
+.dock:hover{text-decoration:none}
+.dock.show{transform:none}
+
+/* ── responsive ────────────────────────────────────────────────────────── */
+@media (max-width:1068px){
+  .dims{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .converge{display:none}
+  .fb-bar{margin-top:18px}
+  .steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .step:nth-child(3)::after{display:none}
+  .prin{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .fgrid{grid-template-columns:1fr 1fr}
+  .inst-body{grid-template-columns:minmax(0,1fr)}
+  .read{border-left:0;border-top:1px solid var(--hair);grid-template-rows:none;grid-template-columns:1.3fr 1fr 1fr 1fr}
+  .read > div{border-bottom:0;border-left:1px solid var(--hair)}
+  .read > div:first-child{border-left:0}
+}
+@media (max-width:900px){
+  .states,.plans,.plain{grid-template-columns:minmax(0,1fr)}
+  .plan .q{min-height:0}
+  .private{grid-template-columns:minmax(0,1fr)}
+  .private .side{text-align:left}
+}
+@media (max-width:734px){
+  body{font-size:16px}
+  .wrap{padding:0 20px}
+  .family .wrap{justify-content:flex-start;gap:22px}
+  .nav-links a:not(.nav-cta){display:none}
+  .inst{border-radius:18px;margin-left:-6px;margin-right:-6px}
+  .inst-top{padding:13px 16px;font-size:12px}
+  .inst-top .lg{display:none}
+  .plot{padding:48px 14px 12px 44px}
+  .canvas{aspect-ratio:4/3.6}
+  .ylab{left:-38px;width:32px;font-size:10.5px}
+  .xlabs{font-size:10.5px}
+  .xlabs .odd{visibility:hidden}
+  .zl{font-size:9.5px;letter-spacing:.08em}
+  .mark-tag{font-size:11px;padding:4px 8px}
+  .read{grid-template-columns:1fr 1fr}
+  .read > div{padding:14px 16px;border-left:0}
+  .read > div:nth-child(even){border-left:1px solid var(--hair)}
+  .read > div:nth-child(n+3){border-top:1px solid var(--hair)}
+  .read .v{font-size:24px}
+  .state{padding:16px!important}
+  .state .v{font-size:26px}
+  .state .why{min-height:0;font-size:12.5px}
+  .control{padding:12px 16px 16px;gap:12px;flex-wrap:wrap}
+  .control label{width:100%;display:flex;justify-content:space-between}
+  .control input[type=range]{flex:1 1 100%}
+  .control .replay{margin-left:auto}
+  .dims{grid-template-columns:minmax(0,1fr);gap:10px}
+  .fb-bar{flex-direction:column;align-items:flex-start;gap:8px;padding:24px 22px}
+  .steps{grid-template-columns:minmax(0,1fr);gap:10px}
+  .step::after{display:none!important}
+  .doc-h{padding:22px 20px 18px}
+  .doc-meta{grid-template-columns:minmax(0,1fr)}
+  .doc-meta div{padding:11px 20px}
+  .doc-meta div + div{border-left:0;border-top:1px solid var(--ink-hair)}
+  .doc-find{padding:22px 20px 4px}
+  .strip{padding:62px 20px 24px}
+  .doc dl{grid-template-columns:minmax(0,1fr)}
+  .doc dt{padding:14px 20px 2px;border-bottom:0;font-size:13px}
+  .doc dd{padding:0 20px 14px}
+  .doc-f{padding:12px 20px;flex-direction:column;gap:4px}
+  .prin{grid-template-columns:minmax(0,1fr)}
+  .layer{grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;padding:18px 18px;margin:0!important}
+  .layer .verb{grid-column:1/-1}
+  .indep{flex-direction:column;gap:8px}
+  .fgrid{grid-template-columns:1fr 1fr}
+  .dock{display:block}
+  .lg{display:none}
+  .terms{flex-direction:column;align-items:center;gap:6px}
+  .terms span::before{content:none}
+  .sheet form{padding:22px 20px}
+  dialog.sheet{width:100%;max-width:100%;margin:auto 0 0;border-radius:20px 20px 0 0;max-height:92%}
+}
+@media (prefers-reduced-motion:reduce){
+  .hb-flow,.hb-gate,.hb-cap,.hb-halo,.converge .pulse,.layer .live,.family a[href*="axonos-community-radar"]::before{animation:none}
+  .plan{transition:none}.plan:hover{transform:none}
+  .mark,.mark-tag{transition:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<nav class="family" aria-label="The family">
+  <div class="wrap">
+    <a href="/" aria-current="page">DY PROOF</a>
+    <a href="https://dyresearch.github.io/" rel="noopener">DY Research <span aria-hidden="true">↗</span></a>
+    <a href="https://axonos-bci.github.io/axonos-community-radar/" rel="noopener">Radar <span aria-hidden="true">↗</span></a>
+    <a href="https://axonos.org" rel="noopener">AxonOS <span aria-hidden="true">↗</span></a>
+  </div>
+</nav>
+<nav class="nav" aria-label="Primary">
+  <div class="wrap">
+    <a class="brand" href="#top">DY PROOF</a>
+    <div class="nav-links">
+      <a href="#boundary">The boundary</a>
+      <a href="#examination">Examination</a>
+      <a href="#engagements">Engagements</a>
+      <a href="#investors">Investors</a>
+      <a class="nav-cta" href="mailto:connect@axonos.org?subject=Examination%20request" data-request="fb">Let&#8217;s DY it</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ═══ HERO ════════════════════════════════════════════════════════════ -->
+<section class="hero first" id="top">
+  <div class="wrap center">
+    <span class="eyebrow">Independent technology diagnostics</span>
+    <h1>Find where your system breaks. <span class="l2 grad">Before production does.</span></h1>
+    <p class="lead measure">We determine the operating limits, failure boundaries and technical constraints of complex systems —
+      <b>and prove them with evidence you can reproduce.</b></p>
+    <div class="actions">
+      <a class="btn" href="mailto:connect@axonos.org?subject=Examination%20request" data-request="fb">Let&#8217;s DY it</a>
+      <a class="more" href="#examination">How an examination runs</a>
+    </div>
+    <div class="caps" aria-label="Terms of every examination"><span>Confidential</span><span>Independent</span><span>Evidence-based</span></div>
+    <div class="hband-wrap"><svg class="hband" viewBox="0 0 1600 190" role="img" aria-label="Controlled load passes into the system, meets its boundary, and leaves as a written finding of where it breaks." preserveAspectRatio="xMidYMid meet"><defs><linearGradient id="phbM" x1="90" x2="780" y1="0" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".24" stop-color="#fff"/><stop offset=".9" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="phbFade" maskUnits="userSpaceOnUse" x="90" y="0" width="690" height="190"><rect x="90" y="0" width="690" height="190" fill="url(#phbM)"/></mask><clipPath id="phbClip"><rect x="90" y="0" width="690" height="190"/></clipPath><radialGradient id="phbGate" cx="800" cy="92" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2dd4ff" stop-opacity=".32"/><stop offset="1" stop-color="#2dd4ff" stop-opacity="0"/></radialGradient><linearGradient id="phbLine" x1="0" y1="18" x2="0" y2="168" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2dd4ff" stop-opacity="0"/><stop offset=".5" stop-color="#2dd4ff"/><stop offset="1" stop-color="#2dd4ff" stop-opacity="0"/></linearGradient></defs><g clip-path="url(#phbClip)" mask="url(#phbFade)"><g class="hb-flow"><path class="hb-tr hb-o0" d="M90,40.8 L96,43.3 L102,40.2 L108,42.3 L114,42.2 L120,40.6 L126,38.7 L132,35.0 L138,34.9 L144,37.3 L150,37.8 L156,41.6 L162,40.0 L168,44.2 L174,43.8 L180,44.2 L186,41.6 L192,38.7 L198,38.5 L204,39.0 L210,39.6 L216,38.9 L222,37.8 L228,37.6 L234,39.4 L240,38.3 L246,40.2 L252,38.2 L258,42.5 L264,43.3 L270,45.7 L276,43.1 L282,41.4 L288,37.9 L294,39.0 L300,35.4 L306,37.7 L312,34.4 L318,39.5 L324,40.3 L330,42.9 L336,42.4 L342,40.3 L348,41.4 L354,41.3 L360,42.2 L366,41.5 L372,39.6 L378,40.4 L384,39.5 L390,38.9 L396,37.1 L402,34.3 L408,37.4 L414,37.9 L420,43.3 L426,42.1 L432,44.1 L438,43.1 L444,43.7 L450,41.9 L456,39.0 L462,36.7 L468,36.9 L474,37.9 L480,40.0 L486,38.3 L492,39.2 L498,38.0 L504,40.8 L510,40.5 L516,41.2 L522,41.1 L528,42.4 L534,44.2 L540,43.5 L546,41.0 L552,37.8 L558,35.6 L564,36.6 L570,36.3 L576,37.7 L582,38.2 L588,40.9 L594,43.5 L600,44.0 L606,42.9 L612,40.5 L618,40.2 L624,40.5 L630,41.1 L636,39.5 L642,39.0 L648,37.7 L654,39.0 L660,37.9 L666,37.2 L672,37.1 L678,38.6 L684,42.6 L690,44.4 L696,44.4 L702,43.7 L708,40.9 L714,41.8 L720,38.1 L726,37.2 L732,35.5 L738,35.9 L744,40.0 L750,39.6 L756,41.3 L762,39.5 L768,39.8 L774,42.5 L780,40.8 L786,43.3 L792,40.2 L798,42.3 L804,42.2 L810,40.6 L816,38.7 L822,35.0 L828,34.9 L834,37.3 L840,37.8 L846,41.6 L852,40.0 L858,44.2 L864,43.8 L870,44.2 L876,41.6 L882,38.7 L888,38.5 L894,39.0 L900,39.6 L906,38.9 L912,37.8 L918,37.6 L924,39.4 L930,38.3 L936,40.2 L942,38.2 L948,42.5 L954,43.3 L960,45.7 L966,43.1 L972,41.4 L978,37.9 L984,39.0 L990,35.4 L996,37.7 L1002,34.4 L1008,39.5 L1014,40.3 L1020,42.9 L1026,42.4 L1032,40.3 L1038,41.4 L1044,41.3 L1050,42.2 L1056,41.5 L1062,39.6 L1068,40.4 L1074,39.5 L1080,38.9 L1086,37.1 L1092,34.3 L1098,37.4 L1104,37.9 L1110,43.3 L1116,42.1 L1122,44.1 L1128,43.1 L1134,43.7 L1140,41.9 L1146,39.0 L1152,36.7 L1158,36.9 L1164,37.9 L1170,40.0 L1176,38.3 L1182,39.2 L1188,38.0 L1194,40.8 L1200,40.5 L1206,41.2 L1212,41.1 L1218,42.4 L1224,44.2 L1230,43.5 L1236,41.0 L1242,37.8 L1248,35.6 L1254,36.6 L1260,36.3 L1266,37.7 L1272,38.2 L1278,40.9 L1284,43.5 L1290,44.0 L1296,42.9 L1302,40.5 L1308,40.2 L1314,40.5 L1320,41.1 L1326,39.5 L1332,39.0 L1338,37.7 L1344,39.0 L1350,37.9 L1356,37.2 L1362,37.1 L1368,38.6 L1374,42.6 L1380,44.4 L1386,44.4 L1392,43.7 L1398,40.9 L1404,41.8 L1410,38.1 L1416,37.2 L1422,35.5 L1428,35.9 L1434,40.0 L1440,39.6 L1446,41.3 L1452,39.5 L1458,39.8 L1464,42.5 L1470,40.8" fill="none" stroke="#8b7cff" stroke-opacity="0.34" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path class="hb-tr hb-o1" d="M90,54.4 L96,52.5 L102,55.3 L108,54.9 L114,56.7 L120,60.9 L126,60.5 L132,55.6 L138,55.5 L144,52.5 L150,51.7 L156,49.0 L162,49.2 L168,53.3 L174,59.3 L180,59.1 L186,56.1 L192,58.4 L198,57.6 L204,57.1 L210,52.4 L216,53.6 L222,54.3 L228,55.5 L234,52.5 L240,51.2 L246,51.7 L252,54.6 L258,55.5 L264,57.5 L270,59.3 L276,60.5 L282,57.9 L288,57.7 L294,51.7 L300,49.1 L306,50.2 L312,52.0 L318,53.9 L324,55.2 L330,56.6 L336,57.3 L342,61.0 L348,54.7 L354,54.3 L360,56.5 L366,57.3 L372,54.8 L378,53.9 L384,50.7 L390,52.1 L396,53.2 L402,51.2 L408,52.9 L414,59.8 L420,59.5 L426,61.3 L432,58.8 L438,54.8 L444,53.0 L450,52.9 L456,50.2 L462,50.1 L468,54.1 L474,54.1 L480,58.5 L486,56.1 L492,54.8 L498,55.8 L504,59.3 L510,56.9 L516,56.0 L522,55.3 L528,55.3 L534,53.4 L540,50.4 L546,48.0 L552,52.4 L558,55.3 L564,58.5 L570,58.3 L576,60.3 L582,59.4 L588,56.8 L594,54.1 L600,51.1 L606,51.3 L612,51.7 L618,55.6 L624,53.1 L630,54.5 L636,54.3 L642,56.2 L648,57.3 L654,57.2 L660,55.5 L666,59.5 L672,59.6 L678,54.0 L684,49.9 L690,50.9 L696,49.8 L702,53.3 L708,52.5 L714,55.2 L720,61.2 L726,61.7 L732,57.0 L738,55.5 L744,55.9 L750,52.1 L756,54.7 L762,51.9 L768,52.7 L774,54.1 L780,54.4 L786,52.5 L792,55.3 L798,54.9 L804,56.7 L810,60.9 L816,60.5 L822,55.6 L828,55.5 L834,52.5 L840,51.7 L846,49.0 L852,49.2 L858,53.3 L864,59.3 L870,59.1 L876,56.1 L882,58.4 L888,57.6 L894,57.1 L900,52.4 L906,53.6 L912,54.3 L918,55.5 L924,52.5 L930,51.2 L936,51.7 L942,54.6 L948,55.5 L954,57.5 L960,59.3 L966,60.5 L972,57.9 L978,57.7 L984,51.7 L990,49.1 L996,50.2 L1002,52.0 L1008,53.9 L1014,55.2 L1020,56.6 L1026,57.3 L1032,61.0 L1038,54.7 L1044,54.3 L1050,56.5 L1056,57.3 L1062,54.8 L1068,53.9 L1074,50.7 L1080,52.1 L1086,53.2 L1092,51.2 L1098,52.9 L1104,59.8 L1110,59.5 L1116,61.3 L1122,58.8 L1128,54.8 L1134,53.0 L1140,52.9 L1146,50.2 L1152,50.1 L1158,54.1 L1164,54.1 L1170,58.5 L1176,56.1 L1182,54.8 L1188,55.8 L1194,59.3 L1200,56.9 L1206,56.0 L1212,55.3 L1218,55.3 L1224,53.4 L1230,50.4 L1236,48.0 L1242,52.4 L1248,55.3 L1254,58.5 L1260,58.3 L1266,60.3 L1272,59.4 L1278,56.8 L1284,54.1 L1290,51.1 L1296,51.3 L1302,51.7 L1308,55.6 L1314,53.1 L1320,54.5 L1326,54.3 L1332,56.2 L1338,57.3 L1344,57.2 L1350,55.5 L1356,59.5 L1362,59.6 L1368,54.0 L1374,49.9 L1380,50.9 L1386,49.8 L1392,53.3 L1398,52.5 L1404,55.2 L1410,61.2 L1416,61.7 L1422,57.0 L1428,55.5 L1434,55.9 L1440,52.1 L1446,54.7 L1452,51.9 L1458,52.7 L1464,54.1 L1470,54.4" fill="none" stroke="#8b7cff" stroke-opacity="0.41" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path class="hb-tr hb-o2" d="M90,69.0 L96,67.3 L102,69.6 L108,72.2 L114,71.8 L120,69.8 L126,70.7 L132,72.3 L138,72.0 L144,71.7 L150,67.2 L156,68.9 L162,67.8 L168,66.0 L174,67.1 L180,70.8 L186,73.9 L192,74.7 L198,72.6 L204,70.7 L210,70.6 L216,68.1 L222,64.9 L228,68.0 L234,68.7 L240,71.8 L246,69.9 L252,70.2 L258,71.3 L264,72.6 L270,70.9 L276,70.5 L282,71.5 L288,70.2 L294,68.3 L300,65.3 L306,66.2 L312,69.5 L318,70.5 L324,72.7 L330,73.1 L336,74.8 L342,72.2 L348,68.4 L354,66.7 L360,66.9 L366,68.7 L372,68.3 L378,69.9 L384,70.2 L390,72.8 L396,70.5 L402,70.4 L408,71.8 L414,71.7 L420,71.7 L426,69.2 L432,66.7 L438,67.6 L444,67.0 L450,67.5 L456,70.0 L462,73.9 L468,73.6 L474,75.2 L480,69.8 L486,69.1 L492,68.6 L498,66.2 L504,67.2 L510,69.0 L516,70.1 L522,71.7 L528,71.2 L534,69.5 L540,72.0 L546,72.6 L552,70.2 L558,71.8 L564,68.7 L570,68.3 L576,67.7 L582,65.1 L588,67.8 L594,71.7 L600,73.3 L606,73.2 L612,74.2 L618,70.5 L624,70.8 L630,67.2 L636,65.0 L642,68.5 L648,69.8 L654,69.8 L660,70.6 L666,70.5 L672,71.7 L678,72.0 L684,70.8 L690,70.0 L696,73.3 L702,69.0 L708,67.7 L714,65.8 L720,66.7 L726,69.3 L732,70.6 L738,71.5 L744,74.4 L750,75.4 L756,70.8 L762,68.4 L768,67.3 L774,67.0 L780,69.0 L786,67.3 L792,69.6 L798,72.2 L804,71.8 L810,69.8 L816,70.7 L822,72.3 L828,72.0 L834,71.7 L840,67.2 L846,68.9 L852,67.8 L858,66.0 L864,67.1 L870,70.8 L876,73.9 L882,74.7 L888,72.6 L894,70.7 L900,70.6 L906,68.1 L912,64.9 L918,68.0 L924,68.7 L930,71.8 L936,69.9 L942,70.2 L948,71.3 L954,72.6 L960,70.9 L966,70.5 L972,71.5 L978,70.2 L984,68.3 L990,65.3 L996,66.2 L1002,69.5 L1008,70.5 L1014,72.7 L1020,73.1 L1026,74.8 L1032,72.2 L1038,68.4 L1044,66.7 L1050,66.9 L1056,68.7 L1062,68.3 L1068,69.9 L1074,70.2 L1080,72.8 L1086,70.5 L1092,70.4 L1098,71.8 L1104,71.7 L1110,71.7 L1116,69.2 L1122,66.7 L1128,67.6 L1134,67.0 L1140,67.5 L1146,70.0 L1152,73.9 L1158,73.6 L1164,75.2 L1170,69.8 L1176,69.1 L1182,68.6 L1188,66.2 L1194,67.2 L1200,69.0 L1206,70.1 L1212,71.7 L1218,71.2 L1224,69.5 L1230,72.0 L1236,72.6 L1242,70.2 L1248,71.8 L1254,68.7 L1260,68.3 L1266,67.7 L1272,65.1 L1278,67.8 L1284,71.7 L1290,73.3 L1296,73.2 L1302,74.2 L1308,70.5 L1314,70.8 L1320,67.2 L1326,65.0 L1332,68.5 L1338,69.8 L1344,69.8 L1350,70.6 L1356,70.5 L1362,71.7 L1368,72.0 L1374,70.8 L1380,70.0 L1386,73.3 L1392,69.0 L1398,67.7 L1404,65.8 L1410,66.7 L1416,69.3 L1422,70.6 L1428,71.5 L1434,74.4 L1440,75.4 L1446,70.8 L1452,68.4 L1458,67.3 L1464,67.0 L1470,69.0" fill="none" stroke="#8b7cff" stroke-opacity="0.48" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path class="hb-tr hb-o3" d="M90,87.5 L96,86.4 L102,85.5 L108,86.0 L114,87.1 L120,86.7 L126,86.6 L132,84.3 L138,83.3 L144,82.0 L150,81.5 L156,81.9 L162,85.4 L168,86.3 L174,86.1 L180,86.1 L186,86.8 L192,85.9 L198,86.1 L204,86.7 L210,87.1 L216,86.0 L222,83.2 L228,81.6 L234,82.1 L240,82.8 L246,82.6 L252,85.6 L258,87.4 L264,86.7 L270,85.0 L276,86.4 L282,86.5 L288,87.0 L294,86.3 L300,85.9 L306,84.8 L312,83.5 L318,80.4 L324,81.2 L330,84.5 L336,85.4 L342,84.7 L348,86.7 L354,87.7 L360,85.6 L366,85.2 L372,86.7 L378,87.7 L384,86.5 L390,84.8 L396,82.5 L402,82.8 L408,82.0 L414,81.6 L420,83.5 L426,87.6 L432,86.7 L438,85.3 L444,85.8 L450,87.4 L456,86.1 L462,85.9 L468,86.7 L474,86.7 L480,84.1 L486,81.3 L492,81.2 L498,83.0 L504,84.0 L510,84.3 L516,86.3 L522,87.4 L528,86.7 L534,84.7 L540,86.0 L546,87.5 L552,87.6 L558,84.8 L564,84.6 L570,83.8 L576,81.9 L582,80.2 L588,83.3 L594,85.5 L600,86.1 L606,86.0 L612,86.5 L618,86.3 L624,86.4 L630,86.0 L636,86.2 L642,87.6 L648,85.9 L654,82.4 L660,81.4 L666,83.1 L672,81.9 L678,83.2 L684,86.1 L690,87.5 L696,85.7 L702,86.2 L708,85.9 L714,86.5 L720,86.9 L726,86.8 L732,85.2 L738,85.0 L744,82.7 L750,80.5 L756,81.9 L762,84.5 L768,84.6 L774,85.6 L780,87.5 L786,86.4 L792,85.5 L798,86.0 L804,87.1 L810,86.7 L816,86.6 L822,84.3 L828,83.3 L834,82.0 L840,81.5 L846,81.9 L852,85.4 L858,86.3 L864,86.1 L870,86.1 L876,86.8 L882,85.9 L888,86.1 L894,86.7 L900,87.1 L906,86.0 L912,83.2 L918,81.6 L924,82.1 L930,82.8 L936,82.6 L942,85.6 L948,87.4 L954,86.7 L960,85.0 L966,86.4 L972,86.5 L978,87.0 L984,86.3 L990,85.9 L996,84.8 L1002,83.5 L1008,80.4 L1014,81.2 L1020,84.5 L1026,85.4 L1032,84.7 L1038,86.7 L1044,87.7 L1050,85.6 L1056,85.2 L1062,86.7 L1068,87.7 L1074,86.5 L1080,84.8 L1086,82.5 L1092,82.8 L1098,82.0 L1104,81.6 L1110,83.5 L1116,87.6 L1122,86.7 L1128,85.3 L1134,85.8 L1140,87.4 L1146,86.1 L1152,85.9 L1158,86.7 L1164,86.7 L1170,84.1 L1176,81.3 L1182,81.2 L1188,83.0 L1194,84.0 L1200,84.3 L1206,86.3 L1212,87.4 L1218,86.7 L1224,84.7 L1230,86.0 L1236,87.5 L1242,87.6 L1248,84.8 L1254,84.6 L1260,83.8 L1266,81.9 L1272,80.2 L1278,83.3 L1284,85.5 L1290,86.1 L1296,86.0 L1302,86.5 L1308,86.3 L1314,86.4 L1320,86.0 L1326,86.2 L1332,87.6 L1338,85.9 L1344,82.4 L1350,81.4 L1356,83.1 L1362,81.9 L1368,83.2 L1374,86.1 L1380,87.5 L1386,85.7 L1392,86.2 L1398,85.9 L1404,86.5 L1410,86.9 L1416,86.8 L1422,85.2 L1428,85.0 L1434,82.7 L1440,80.5 L1446,81.9 L1452,84.5 L1458,84.6 L1464,85.6 L1470,87.5" fill="none" stroke="#8b7cff" stroke-opacity="0.55" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path class="hb-tr hb-o0" d="M90,100.6 L96,101.6 L102,102.9 L108,104.2 L114,105.3 L120,101.4 L126,97.1 L132,97.4 L138,97.3 L144,97.4 L150,98.9 L156,100.3 L162,97.4 L168,99.3 L174,101.2 L180,103.7 L186,103.8 L192,103.8 L198,101.7 L204,100.3 L210,95.3 L216,94.3 L222,98.8 L228,100.1 L234,98.4 L240,99.1 L246,101.7 L252,100.7 L258,101.8 L264,102.8 L270,105.4 L276,102.2 L282,98.3 L288,96.0 L294,96.8 L300,95.2 L306,98.1 L312,101.8 L318,101.0 L324,99.8 L330,101.6 L336,103.0 L342,101.5 L348,102.7 L354,102.9 L360,100.9 L366,95.1 L372,94.9 L378,96.4 L384,98.7 L390,99.2 L396,102.2 L402,102.9 L408,102.1 L414,100.4 L420,101.5 L426,103.6 L432,101.5 L438,99.2 L444,97.7 L450,96.5 L456,93.9 L462,97.4 L468,100.6 L474,103.4 L480,102.3 L486,102.4 L492,102.1 L498,101.6 L504,99.4 L510,101.4 L516,101.8 L522,96.7 L528,95.1 L534,96.8 L540,97.1 L546,98.0 L552,103.9 L558,104.6 L564,103.4 L570,100.7 L576,101.3 L582,100.6 L588,99.7 L594,98.2 L600,100.0 L606,97.8 L612,94.3 L618,96.3 L624,100.5 L630,102.7 L636,103.4 L642,104.7 L648,102.6 L654,101.2 L660,98.0 L666,98.9 L672,99.3 L678,99.2 L684,96.8 L690,97.6 L696,97.0 L702,98.2 L708,101.9 L714,105.5 L720,104.6 L726,101.7 L732,101.8 L738,99.7 L744,96.7 L750,96.1 L756,100.8 L762,99.1 L768,96.7 L774,96.6 L780,100.6 L786,101.6 L792,102.9 L798,104.2 L804,105.3 L810,101.4 L816,97.1 L822,97.4 L828,97.3 L834,97.4 L840,98.9 L846,100.3 L852,97.4 L858,99.3 L864,101.2 L870,103.7 L876,103.8 L882,103.8 L888,101.7 L894,100.3 L900,95.3 L906,94.3 L912,98.8 L918,100.1 L924,98.4 L930,99.1 L936,101.7 L942,100.7 L948,101.8 L954,102.8 L960,105.4 L966,102.2 L972,98.3 L978,96.0 L984,96.8 L990,95.2 L996,98.1 L1002,101.8 L1008,101.0 L1014,99.8 L1020,101.6 L1026,103.0 L1032,101.5 L1038,102.7 L1044,102.9 L1050,100.9 L1056,95.1 L1062,94.9 L1068,96.4 L1074,98.7 L1080,99.2 L1086,102.2 L1092,102.9 L1098,102.1 L1104,100.4 L1110,101.5 L1116,103.6 L1122,101.5 L1128,99.2 L1134,97.7 L1140,96.5 L1146,93.9 L1152,97.4 L1158,100.6 L1164,103.4 L1170,102.3 L1176,102.4 L1182,102.1 L1188,101.6 L1194,99.4 L1200,101.4 L1206,101.8 L1212,96.7 L1218,95.1 L1224,96.8 L1230,97.1 L1236,98.0 L1242,103.9 L1248,104.6 L1254,103.4 L1260,100.7 L1266,101.3 L1272,100.6 L1278,99.7 L1284,98.2 L1290,100.0 L1296,97.8 L1302,94.3 L1308,96.3 L1314,100.5 L1320,102.7 L1326,103.4 L1332,104.7 L1338,102.6 L1344,101.2 L1350,98.0 L1356,98.9 L1362,99.3 L1368,99.2 L1374,96.8 L1380,97.6 L1386,97.0 L1392,98.2 L1398,101.9 L1404,105.5 L1410,104.6 L1416,101.7 L1422,101.8 L1428,99.7 L1434,96.7 L1440,96.1 L1446,100.8 L1452,99.1 L1458,96.7 L1464,96.6 L1470,100.6" fill="none" stroke="#8b7cff" stroke-opacity="0.34" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path class="hb-tr hb-o1" d="M90,120.1 L96,118.0 L102,115.9 L108,115.0 L114,116.9 L120,112.2 L126,113.7 L132,114.3 L138,110.8 L144,109.9 L150,116.1 L156,117.0 L162,118.8 L168,121.4 L174,118.1 L180,111.9 L186,113.1 L192,114.4 L198,112.1 L204,112.9 L210,113.9 L216,113.6 L222,114.1 L228,116.5 L234,118.8 L240,121.6 L246,117.0 L252,114.4 L258,112.3 L264,110.1 L270,110.6 L276,116.8 L282,113.9 L288,113.9 L294,116.6 L300,118.1 L306,115.3 L312,119.2 L318,118.9 L324,115.4 L330,110.0 L336,111.1 L342,110.1 L348,113.2 L354,116.6 L360,118.3 L366,115.9 L372,117.2 L378,116.5 L384,117.6 L390,116.1 L396,114.1 L402,114.0 L408,111.4 L414,107.3 L420,113.5 L426,118.6 L432,116.7 L438,119.4 L444,119.2 L450,114.1 L456,114.3 L462,116.9 L468,112.9 L474,112.7 L480,112.4 L486,112.1 L492,111.5 L498,115.8 L504,118.8 L510,122.0 L516,117.7 L522,115.1 L528,113.5 L534,113.8 L540,110.8 L546,114.6 L552,114.0 L558,111.9 L564,113.2 L570,118.2 L576,115.6 L582,119.5 L588,121.5 L594,116.3 L600,110.6 L606,112.0 L612,111.3 L618,112.9 L624,114.3 L630,115.4 L636,115.6 L642,115.7 L648,116.8 L654,119.1 L660,118.4 L666,116.0 L672,114.6 L678,110.5 L684,108.5 L690,111.5 L696,117.6 L702,116.1 L708,116.0 L714,118.2 L720,117.8 L726,114.0 L732,118.6 L738,116.4 L744,112.7 L750,111.6 L756,111.5 L762,108.9 L768,115.4 L774,118.0 L780,120.1 L786,118.0 L792,115.9 L798,115.0 L804,116.9 L810,112.2 L816,113.7 L822,114.3 L828,110.8 L834,109.9 L840,116.1 L846,117.0 L852,118.8 L858,121.4 L864,118.1 L870,111.9 L876,113.1 L882,114.4 L888,112.1 L894,112.9 L900,113.9 L906,113.6 L912,114.1 L918,116.5 L924,118.8 L930,121.6 L936,117.0 L942,114.4 L948,112.3 L954,110.1 L960,110.6 L966,116.8 L972,113.9 L978,113.9 L984,116.6 L990,118.1 L996,115.3 L1002,119.2 L1008,118.9 L1014,115.4 L1020,110.0 L1026,111.1 L1032,110.1 L1038,113.2 L1044,116.6 L1050,118.3 L1056,115.9 L1062,117.2 L1068,116.5 L1074,117.6 L1080,116.1 L1086,114.1 L1092,114.0 L1098,111.4 L1104,107.3 L1110,113.5 L1116,118.6 L1122,116.7 L1128,119.4 L1134,119.2 L1140,114.1 L1146,114.3 L1152,116.9 L1158,112.9 L1164,112.7 L1170,112.4 L1176,112.1 L1182,111.5 L1188,115.8 L1194,118.8 L1200,122.0 L1206,117.7 L1212,115.1 L1218,113.5 L1224,113.8 L1230,110.8 L1236,114.6 L1242,114.0 L1248,111.9 L1254,113.2 L1260,118.2 L1266,115.6 L1272,119.5 L1278,121.5 L1284,116.3 L1290,110.6 L1296,112.0 L1302,111.3 L1308,112.9 L1314,114.3 L1320,115.4 L1326,115.6 L1332,115.7 L1338,116.8 L1344,119.1 L1350,118.4 L1356,116.0 L1362,114.6 L1368,110.5 L1374,108.5 L1380,111.5 L1386,117.6 L1392,116.1 L1398,116.0 L1404,118.2 L1410,117.8 L1416,114.0 L1422,118.6 L1428,116.4 L1434,112.7 L1440,111.6 L1446,111.5 L1452,108.9 L1458,115.4 L1464,118.0 L1470,120.1" fill="none" stroke="#8b7cff" stroke-opacity="0.41" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path class="hb-tr hb-o2" d="M90,134.2 L96,131.3 L102,131.1 L108,130.1 L114,131.2 L120,129.4 L126,130.5 L132,127.6 L138,125.7 L144,127.1 L150,128.9 L156,130.4 L162,131.5 L168,131.8 L174,131.0 L180,130.4 L186,133.2 L192,132.3 L198,132.5 L204,128.5 L210,129.4 L216,125.5 L222,127.6 L228,129.5 L234,129.6 L240,127.8 L246,130.1 L252,130.2 L258,130.3 L264,134.3 L270,134.6 L276,130.2 L282,131.0 L288,129.3 L294,128.3 L300,128.6 L306,130.7 L312,126.7 L318,126.6 L324,128.4 L330,129.2 L336,131.2 L342,133.2 L348,133.4 L354,130.0 L360,131.3 L366,131.7 L372,131.0 L378,130.2 L384,130.2 L390,126.2 L396,125.7 L402,128.1 L408,129.8 L414,129.1 L420,132.3 L426,129.9 L432,130.6 L438,131.5 L444,134.3 L450,131.9 L456,132.1 L462,128.7 L468,127.9 L474,126.8 L480,129.0 L486,128.8 L492,129.3 L498,127.0 L504,130.0 L510,129.6 L516,132.6 L522,133.6 L528,134.0 L534,129.7 L540,130.7 L546,130.0 L552,129.0 L558,129.7 L564,129.5 L570,126.1 L576,126.3 L582,128.5 L588,130.3 L594,130.8 L600,133.5 L606,131.4 L612,130.5 L618,131.3 L624,133.1 L630,131.2 L636,129.8 L642,129.9 L648,125.3 L654,126.4 L660,129.1 L666,129.9 L672,128.5 L678,131.1 L684,130.2 L690,129.3 L696,134.0 L702,134.0 L708,131.7 L714,130.9 L720,129.4 L726,127.3 L732,128.0 L738,130.4 L744,127.6 L750,128.0 L756,127.4 L762,129.3 L768,130.5 L774,133.0 L780,134.2 L786,131.3 L792,131.1 L798,130.1 L804,131.2 L810,129.4 L816,130.5 L822,127.6 L828,125.7 L834,127.1 L840,128.9 L846,130.4 L852,131.5 L858,131.8 L864,131.0 L870,130.4 L876,133.2 L882,132.3 L888,132.5 L894,128.5 L900,129.4 L906,125.5 L912,127.6 L918,129.5 L924,129.6 L930,127.8 L936,130.1 L942,130.2 L948,130.3 L954,134.3 L960,134.6 L966,130.2 L972,131.0 L978,129.3 L984,128.3 L990,128.6 L996,130.7 L1002,126.7 L1008,126.6 L1014,128.4 L1020,129.2 L1026,131.2 L1032,133.2 L1038,133.4 L1044,130.0 L1050,131.3 L1056,131.7 L1062,131.0 L1068,130.2 L1074,130.2 L1080,126.2 L1086,125.7 L1092,128.1 L1098,129.8 L1104,129.1 L1110,132.3 L1116,129.9 L1122,130.6 L1128,131.5 L1134,134.3 L1140,131.9 L1146,132.1 L1152,128.7 L1158,127.9 L1164,126.8 L1170,129.0 L1176,128.8 L1182,129.3 L1188,127.0 L1194,130.0 L1200,129.6 L1206,132.6 L1212,133.6 L1218,134.0 L1224,129.7 L1230,130.7 L1236,130.0 L1242,129.0 L1248,129.7 L1254,129.5 L1260,126.1 L1266,126.3 L1272,128.5 L1278,130.3 L1284,130.8 L1290,133.5 L1296,131.4 L1302,130.5 L1308,131.3 L1314,133.1 L1320,131.2 L1326,129.8 L1332,129.9 L1338,125.3 L1344,126.4 L1350,129.1 L1356,129.9 L1362,128.5 L1368,131.1 L1374,130.2 L1380,129.3 L1386,134.0 L1392,134.0 L1398,131.7 L1404,130.9 L1410,129.4 L1416,127.3 L1422,128.0 L1428,130.4 L1434,127.6 L1440,128.0 L1446,127.4 L1452,129.3 L1458,130.5 L1464,133.0 L1470,134.2" fill="none" stroke="#8b7cff" stroke-opacity="0.48" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path class="hb-tr hb-o3" d="M90,146.9 L96,148.8 L102,146.6 L108,147.3 L114,145.0 L120,142.1 L126,141.3 L132,144.3 L138,143.1 L144,144.5 L150,145.2 L156,143.2 L162,146.2 L168,149.5 L174,148.3 L180,146.6 L186,144.8 L192,143.8 L198,142.5 L204,144.5 L210,143.4 L216,142.4 L222,144.3 L228,142.5 L234,146.1 L240,149.1 L246,148.9 L252,145.9 L258,144.9 L264,145.8 L270,144.2 L276,144.3 L282,144.2 L288,140.9 L294,142.6 L300,143.3 L306,146.0 L312,147.5 L318,148.3 L324,146.5 L330,144.5 L336,147.3 L342,146.3 L348,144.7 L354,143.5 L360,141.0 L366,141.5 L372,144.2 L378,145.3 L384,145.8 L390,147.1 L396,146.8 L402,144.4 L408,148.6 L414,148.3 L420,144.8 L426,142.7 L432,142.3 L438,141.5 L444,143.8 L450,145.5 L456,143.8 L462,145.2 L468,146.6 L474,145.8 L480,148.7 L486,149.0 L492,145.4 L498,143.0 L504,142.9 L510,142.9 L516,143.2 L522,145.5 L528,141.7 L534,143.5 L540,146.5 L546,146.9 L552,148.0 L558,148.6 L564,146.5 L570,143.4 L576,143.5 L582,145.2 L588,143.2 L594,143.8 L600,141.4 L606,142.2 L612,146.1 L618,147.1 L624,148.1 L630,147.0 L636,147.2 L642,144.7 L648,144.9 L654,146.5 L660,143.7 L666,142.1 L672,141.9 L678,141.5 L684,145.1 L690,147.3 L696,147.5 L702,144.9 L708,147.3 L714,147.1 L720,145.7 L726,146.9 L732,144.7 L738,141.6 L744,141.4 L750,142.6 L756,144.0 L762,146.5 L768,146.1 L774,143.9 L780,146.9 L786,148.8 L792,146.6 L798,147.3 L804,145.0 L810,142.1 L816,141.3 L822,144.3 L828,143.1 L834,144.5 L840,145.2 L846,143.2 L852,146.2 L858,149.5 L864,148.3 L870,146.6 L876,144.8 L882,143.8 L888,142.5 L894,144.5 L900,143.4 L906,142.4 L912,144.3 L918,142.5 L924,146.1 L930,149.1 L936,148.9 L942,145.9 L948,144.9 L954,145.8 L960,144.2 L966,144.3 L972,144.2 L978,140.9 L984,142.6 L990,143.3 L996,146.0 L1002,147.5 L1008,148.3 L1014,146.5 L1020,144.5 L1026,147.3 L1032,146.3 L1038,144.7 L1044,143.5 L1050,141.0 L1056,141.5 L1062,144.2 L1068,145.3 L1074,145.8 L1080,147.1 L1086,146.8 L1092,144.4 L1098,148.6 L1104,148.3 L1110,144.8 L1116,142.7 L1122,142.3 L1128,141.5 L1134,143.8 L1140,145.5 L1146,143.8 L1152,145.2 L1158,146.6 L1164,145.8 L1170,148.7 L1176,149.0 L1182,145.4 L1188,143.0 L1194,142.9 L1200,142.9 L1206,143.2 L1212,145.5 L1218,141.7 L1224,143.5 L1230,146.5 L1236,146.9 L1242,148.0 L1248,148.6 L1254,146.5 L1260,143.4 L1266,143.5 L1272,145.2 L1278,143.2 L1284,143.8 L1290,141.4 L1296,142.2 L1302,146.1 L1308,147.1 L1314,148.1 L1320,147.0 L1326,147.2 L1332,144.7 L1338,144.9 L1344,146.5 L1350,143.7 L1356,142.1 L1362,141.9 L1368,141.5 L1374,145.1 L1380,147.3 L1386,147.5 L1392,144.9 L1398,147.3 L1404,147.1 L1410,145.7 L1416,146.9 L1422,144.7 L1428,141.6 L1434,141.4 L1440,142.6 L1446,144.0 L1452,146.5 L1458,146.1 L1464,143.9 L1470,146.9" fill="none" stroke="#8b7cff" stroke-opacity="0.55" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g></g><rect class="hb-gate" x="680" y="-28" width="240" height="240" fill="url(#phbGate)"/><rect class="hb-gate" x="799" y="18" width="2" height="150" fill="url(#phbLine)"/><line class="hb-track" x1="828" y1="92" x2="1516" y2="92" stroke="#2dd4ff" stroke-opacity=".18"/><rect class="hb-halo" style="animation-delay:-2.8s" x="829.0" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-2.8s" x="836.0" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><rect class="hb-halo" style="animation-delay:-2.6s" x="878.7" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-2.6s" x="885.7" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><rect class="hb-halo" style="animation-delay:-2.4s" x="928.4" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-2.4s" x="935.4" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><rect class="hb-halo" style="animation-delay:-2.2s" x="978.1" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-2.2s" x="985.1" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><rect class="hb-halo" style="animation-delay:-2.0s" x="1027.8" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-2.0s" x="1034.8" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><rect class="hb-halo" style="animation-delay:-1.8s" x="1077.5" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-1.8s" x="1084.5" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><rect class="hb-halo" style="animation-delay:-1.6s" x="1127.2" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-1.6s" x="1134.2" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><rect class="hb-halo" style="animation-delay:-1.4s" x="1176.8" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-1.4s" x="1183.8" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><rect class="hb-halo" style="animation-delay:-1.2s" x="1226.5" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-1.2s" x="1233.5" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><rect class="hb-halo" style="animation-delay:-1.0s" x="1276.2" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-1.0s" x="1283.2" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><rect class="hb-halo" style="animation-delay:-0.8s" x="1325.9" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-0.8s" x="1332.9" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><rect class="hb-halo" style="animation-delay:-0.6s" x="1375.6" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-0.6s" x="1382.6" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><rect class="hb-halo" style="animation-delay:-0.4s" x="1425.3" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-0.4s" x="1432.3" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><rect class="hb-halo" style="animation-delay:-0.2s" x="1475.0" y="75" width="44" height="34" rx="17" fill="#2dd4ff" opacity="0"/><rect class="hb-cap" style="animation-delay:-0.2s" x="1482.0" y="82" width="30" height="20" rx="10" fill="#2dd4ff" opacity=".4"/><text class="hb-l" x="90" y="182" fill="#8e8e93" font-family="ui-monospace, SF Mono, Menlo, Consolas, monospace" font-size="17">controlled load</text><text class="hb-m" x="800" y="182" text-anchor="middle" fill="#2dd4ff" fill-opacity=".85" font-family="ui-monospace, SF Mono, Menlo, Consolas, monospace" font-size="17">the boundary</text><text class="hb-r" x="1512" y="182" text-anchor="end" fill="#2dd4ff" font-family="ui-monospace, SF Mono, Menlo, Consolas, monospace" font-size="17">where it breaks · in writing</text></svg></div>
+  </div>
+</section>
+
+<!-- ═══ THE QUESTION: THE INSTRUMENT ═══════════════════════════════════ -->
+<section id="boundary">
+  <div class="wrap">
+    <div class="head center">
+      <span class="eyebrow">The question</span>
+      <h2>How far can your system go?</h2>
+      <p class="lead measure">Most systems are tested while they work. We examine what happens when conditions stop being ideal.</p>
+    </div>
+
+    <div class="inst" id="inst">
+      <div class="inst-top"><span><b>One workflow under load</b><span class="lg"> · p99 latency against concurrent sessions</span></span><span>Illustrative</span></div>
+      <div class="inst-body">
+        <div class="plot">
+          <div class="canvas" id="canvas">
+            <svg viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true" id="plotsvg">
+              <defs>
+                <linearGradient id="curveG" x1="0" x2="1000" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#34d399"/><stop offset=".3" stop-color="#34d399"/>
+                  <stop offset=".44" stop-color="#ffb340"/><stop offset=".6" stop-color="#ffb340"/>
+                  <stop offset=".68" stop-color="#ff453a"/><stop offset="1" stop-color="#ff453a"/>
+                </linearGradient>
+                <clipPath id="reveal"><rect id="revealR" x="0" y="-60" width="1000" height="1120"/></clipPath>
+              </defs>
+              <g id="zones"></g>
+              <g id="grid"></g>
+              <path class="curve-ghost" id="ghost" vector-effect="non-scaling-stroke"/>
+              <g clip-path="url(#reveal)"><path class="curve" id="curve" vector-effect="non-scaling-stroke"/><g id="errs"></g></g>
+            </svg>
+            <div id="ylabs"></div>
+            <span class="zl s" id="zls">Stable</span><span class="zl d" id="zld">Degraded</span><span class="zl f" id="zlf">Failure</span>
+            <span class="blabel" id="blabel">p99 budget 2.0 s</span>
+            <div class="mark" id="mark"><span class="mark-tag">Failure boundary · 8 sessions</span></div>
+            <div class="probe-line" id="pline"></div>
+            <div class="probe" id="probe"></div>
+          </div>
+          <div class="xlabs" id="xlabs" aria-hidden="true"></div>
+          <p class="xcap">Concurrent sessions</p>
+        </div>
+        <div class="read" aria-live="polite">
+          <div class="state"><span class="k">State</span><span class="v st-stable" id="rState"><i class="dot"></i><span>Stable</span></span><span class="why" id="rWhy">Latency flat, queues empty. Every request answered inside the budget.</span></div>
+          <div><span class="k">p99 latency</span><span class="v" id="rLat">590<small>ms</small></span></div>
+          <div><span class="k">Throughput</span><span class="v" id="rThr">10<small>req/s</small></span></div>
+          <div><span class="k">Errors</span><span class="v" id="rErr">0<small>%</small></span></div>
+        </div>
+      </div>
+      <div class="control">
+        <label for="load">Concurrent sessions <output id="loadOut" for="load">1</output></label>
+        <input type="range" id="load" min="1" max="12" step="1" value="1" aria-describedby="rWhy">
+        <button class="replay" type="button" id="replay">Run the examination</button>
+      </div>
+    </div>
+    <p class="inst-foot">An illustrative examination of one agent workflow. Not a client result.</p>
+
+    <p class="closer">The question is not whether your system works. <span>The question is where it stops working.</span></p>
+  </div>
+</section>
+
+<!-- ═══ THE PROBLEM ═════════════════════════════════════════════════════ -->
+<section id="problem">
+  <div class="wrap">
+    <div class="head center">
+      <span class="eyebrow">The problem</span>
+      <h2>Working is not the same as scalable.</h2>
+      <p class="lead measure">Every system has an operating range. Demos and happy-path tests only ever see the first part of it.</p>
+    </div>
+    <div class="states">
+      <article class="stc s"><span class="tag">Stable</span><h3>It works.</h3>
+        <p>Normal conditions. Latency is flat, queues stay empty, every request is answered inside its budget.</p>
+        <p class="sig">p99 flat · queue depth 0–1 · errors 0%</p></article>
+      <article class="stc d"><span class="tag">Degraded</span><h3>It degrades.</h3>
+        <p>Concurrency, resource pressure and latency start to interact. The tail moves long before the average does.</p>
+        <p class="sig">p99 rising · pools saturating · retries appear</p></article>
+      <article class="stc f"><span class="tag">Failure</span><h3>It fails.</h3>
+        <p>The system crosses its operating boundary. Queues grow without bound, retries amplify load, and it does not recover on its own.</p>
+        <p class="sig">p99 unbounded · queue growing · errors climbing</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ THE EXAMINATION: FIVE DIMENSIONS ════════════════════════════════ -->
+<section id="examination">
+  <div class="wrap">
+    <div class="head center">
+      <span class="eyebrow">The examination</span>
+      <h2>We examine the system.</h2>
+      <p class="lead measure">Not your AI, your roadmap or your team. The running system — measured along five dimensions that meet at one boundary.</p>
+    </div>
+    <div class="dims">
+      <div class="dim"><h3>Execution</h3><p>How the system actually executes, path by path.</p><span class="m">call paths · critical sections</span></div>
+      <div class="dim"><h3>Concurrency</h3><p>What changes under simultaneous demand.</p><span class="m">sessions · contention · locks</span></div>
+      <div class="dim"><h3>Latency</h3><p>Where response time becomes unacceptable.</p><span class="m">p50 · p99 · p99.9</span></div>
+      <div class="dim"><h3>Resource pressure</h3><p>Where compute, memory and queues become the limit.</p><span class="m">CPU · memory · queues · pools</span></div>
+      <div class="dim"><h3>Determinism</h3><p>How reproducibly it behaves under equivalent conditions.</p><span class="m">run-to-run variance · jitter</span></div>
+    </div>
+    <svg class="converge" viewBox="0 0 1000 84" preserveAspectRatio="none" aria-hidden="true">
+      <defs><linearGradient id="convG" x1="0" y1="0" x2="0" y2="84" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#2dd4ff" stop-opacity=".7"/></linearGradient></defs>
+      <path d="M100,0 C100,50 500,34 500,84"/><path d="M300,0 C300,50 500,34 500,84"/><path d="M500,0 L500,84"/><path d="M700,0 C700,50 500,34 500,84"/><path d="M900,0 C900,50 500,34 500,84"/>
+      <path class="pulse" d="M100,0 C100,50 500,34 500,84" style="animation-delay:0s"/><path class="pulse" d="M500,0 L500,84" style="animation-delay:.6s"/><path class="pulse" d="M900,0 C900,50 500,34 500,84" style="animation-delay:1.2s"/><path class="pulse" d="M300,0 C300,50 500,34 500,84" style="animation-delay:1.8s"/><path class="pulse" d="M700,0 C700,50 500,34 500,84" style="animation-delay:2.4s"/>
+    </svg>
+    <div class="fb-bar">
+      <div><span class="fb-k">At the centre</span><h3>The failure boundary</h3></div>
+      <p>The conditions under which the system stops behaving acceptably — located, explained by its mechanism, and reproduced.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW IT RUNS ═════════════════════════════════════════════════════ -->
+<section id="process">
+  <div class="wrap">
+    <div class="head center">
+      <span class="eyebrow">How an examination runs</span>
+      <h2>Five steps. One boundary.</h2>
+    </div>
+    <ol class="steps">
+      <li class="step"><h3>Select</h3><p>One critical workflow, the one whose failure would cost the most.</p></li>
+      <li class="step"><h3>Stress</h3><p>Controlled operating conditions, raised one step at a time.</p></li>
+      <li class="step"><h3>Observe</h3><p>Actual behaviour, measured at every step. Nothing assumed.</p></li>
+      <li class="step"><h3>Locate</h3><p>The boundary identified, together with the mechanism behind it.</p></li>
+      <li class="step"><h3>Prove</h3><p>Reproducible evidence: the harness, the conditions, the data.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══ THE RESULT, ON PAPER ════════════════════════════════════════════ -->
+<section class="paper" id="report">
+  <div class="wrap">
+    <div class="head center" style="margin-bottom:0">
+      <span class="eyebrow">What you receive</span>
+      <h2>You get a boundary.</h2>
+      <p class="lead measure">A documented technical boundary: where the system&#8217;s behaviour changes, why, and under what conditions it happens again.</p>
+      <p class="nots"><s>A generic benchmark score</s><s>A consultant&#8217;s opinion</s><s>Pass or fail</s></p>
+    </div>
+
+    <article class="doc" aria-label="Specimen failure boundary report">
+      <div class="doc-h">
+        <div><div class="who">DY PROOF</div><div class="ttl">Failure Boundary Report</div></div>
+        <span class="spec">Specimen</span>
+      </div>
+      <div class="doc-meta">
+        <div>Workflow<b>Agent session: plan, retrieve, call tool, respond</b></div>
+        <div>Engagement<b>Failure Boundary · 72 hours</b></div>
+        <div>Load profile<b>1 → 12 concurrent sessions, 5 runs</b></div>
+      </div>
+      <div class="doc-find">
+        <span class="k">Executive finding</span>
+        <p>The workflow holds its 2.0 s p99 budget up to 8 concurrent sessions. Above 8, tool-call retries saturate a shared connection pool and latency grows without bound.</p>
+      </div>
+      <div class="strip" aria-label="Operating range: stable from 1 to 5 sessions, degraded from 6 to 8, failure above 8.">
+        <div class="strip-bar">
+          <i style="width:36.4%;background:#34d399"></i><i style="width:27.3%;background:#ffb340"></i><i style="width:36.3%;background:#ff453a"></i>
+          <span class="ms" style="left:63.7%"></span>
+          <span class="strip-at" style="left:63.7%">8 concurrent<br>sessions</span>
+        </div>
+        <div class="strip-leg"><span style="width:36.4%">Normal operation</span><span style="width:27.3%">Degradation</span><span style="width:36.3%">Failure</span></div>
+      </div>
+      <dl>
+        <dt>Operating condition</dt><dd>Production configuration on staging hardware; one inference endpoint; tool calls through a shared HTTP pool of 8 connections.</dd>
+        <dt>Observed boundary</dt><dd>8 concurrent sessions. At 9, p99 leaves the budget and does not return while load holds.</dd>
+        <dt>Failure mechanism</dt><dd>Retries share the pool with first attempts. At saturation, retries queue behind the requests they retry, and queue depth grows every second.</dd>
+        <dt>Evidence</dt><dd>12 load steps × 5 runs. Latency histograms, pool-wait traces, queue depth per second. <span class="mono">appendix A</span></dd>
+        <dt>Reproduction conditions</dt><dd>Harness, seeds and configuration delivered with the report; one command re-runs every step. <span class="mono">appendix B</span></dd>
+        <dt>Recommended action</dt><dd>Give retries their own pool; cap retries at 2 per call with jitter; admit sessions above 8 only when the pool has headroom. Then re-examine.</dd>
+        <dt>Confidence</dt><dd><span class="conf">High</span> — the boundary reproduced in 5 of 5 runs, within one session.</dd>
+      </dl>
+      <div class="doc-f"><span>Confidential. Prepared for the client only.</span><span>Specimen: illustrative content, not a client result.</span></div>
+    </article>
+    <p class="under">Every report follows this structure: finding, operating range, boundary, mechanism, evidence, reproduction, action and confidence.</p>
+  </div>
+</section>
+
+<!-- ═══ ENGAGEMENTS ═════════════════════════════════════════════════════
+     The ladder: where one workflow breaks, how far the whole system goes,
+     why it breaks and whether the fix holds. Each step answers one question
+     and leads to the next only if it is needed. DY Research verifies what is
+     claimed; DY PROOF produces new evidence under load. No price is shared. -->
+<section id="engagements">
+  <div class="wrap">
+    <div class="head center">
+      <span class="eyebrow">Engagements</span>
+      <h2>Start with one workflow.</h2>
+      <p class="lead measure">Each engagement answers one question, and leads to the next only if you need it. The first boundary tells you where to look.</p>
+    </div>
+    <ol class="ladder" aria-label="How the engagements build on each other">
+      <li><b>Where</b><span>one workflow breaks</span></li>
+      <li><b>How far</b><span>the whole system can go</span></li>
+      <li><b>Why</b><span>it breaks, and whether the fix holds</span></li>
+    </ol>
+    <div class="plans">
+      <article class="plan featured">
+        <div class="row-top"><span class="when">72 hours</span><span class="badge">Start here</span></div>
+        <span class="name">Failure Boundary</span>
+        <span class="price">$750</span>
+        <span class="q">Where does one critical workflow stop behaving acceptably?</span>
+        <ul><li>One critical workflow</li><li>One load axis, raised step by step</li><li>The boundary and its mechanism</li><li>Written result. No meetings.</li>
+          <li class="plus">The fee is credited in full toward the Boundary Map if you continue within 30 days.</li></ul>
+        <div class="foot"><a class="btn" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20Failure%20Boundary" data-request="fb">Let&#8217;s DY it</a></div>
+      </article>
+      <article class="plan">
+        <div class="row-top"><span class="when">7 working days</span></div>
+        <span class="name">System Boundary Map</span>
+        <span class="price">$3,900</span>
+        <span class="q">How far can the whole system go, and what gives way first?</span>
+        <ul><li>Up to five critical workflows</li><li>All five dimensions, measured</li><li>The operating envelope, workflow by workflow</li><li>One re-examination after your fix</li></ul>
+        <div class="foot"><a class="btn ghost" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20System%20Boundary%20Map" data-request="map">Request an examination</a></div>
+      </article>
+      <article class="plan">
+        <div class="row-top"><span class="when">2&#8211;3 weeks</span></div>
+        <span class="name">Runtime Diagnostics</span>
+        <span class="price"><small>from</small>$9,500</span>
+        <span class="q">Why does it break, and does the fix really move the boundary?</span>
+        <ul><li>Scheduling, jitter and determinism</li><li>Mechanisms traced to their cause in code</li><li>Every fix verified by re-examination</li><li>The harness is yours, to run in your CI</li></ul>
+        <div class="foot"><a class="btn ghost" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20Runtime%20Diagnostics" data-request="rt">Request an examination</a></div>
+      </article>
+    </div>
+    <div class="private">
+      <div><span class="when">Private · for investors and acquirers</span>
+        <h3>Pre-investment examination</h3>
+        <p>Runtime evidence for a deal: the target&#8217;s system examined under load before capital depends on it. Runs alongside DY Research due diligence — one scope, one report — or on its own.</p></div>
+      <div class="side"><b>Scoped with the deal</b><a class="btn" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20Pre-investment%20examination" data-request="dd">Request an examination</a></div>
+    </div>
+    <div class="terms"><span>Scope and price agreed in writing</span><span>Nothing invoiced until the scope is agreed</span><span>Your system and results stay private</span></div>
+
+    <p class="subhead">DY PROOF or DY Research?</p>
+    <div class="which">
+      <div class="here"><span class="v">Prove · DY PROOF</span><h3>Where does the running system stop working?</h3>
+        <p>Produces new evidence: the system examined under controlled load until its boundary is found and reproduced.</p><span class="ends">Ends in a documented boundary</span></div>
+      <div><span class="v">Verify · DY Research</span><h3>Is what is claimed true?</h3>
+        <p>Reads the evidence that exists: the code, the tests and the proofs behind a technology&#8217;s claims.</p><span class="ends">Ends in a written verdict · <a href="https://dyresearch.github.io/" rel="noopener">dyresearch.github.io ↗</a></span></div>
+    </div>
+    <p class="which-foot">Different questions, different prices, one standard of evidence. For a deal, the two run as one engagement.</p>
+  </div>
+</section>
+
+<!-- ═══ INVESTORS ═══════════════════════════════════════════════════════ -->
+<section class="inv" id="investors">
+  <div class="wrap center">
+    <span class="eyebrow">For investors</span>
+    <h2>Before you finance scale.</h2>
+    <div class="horizon" aria-hidden="true"></div>
+    <p class="lead measure">A technical system can look impressive while carrying an undiscovered operating boundary.</p>
+    <p class="lead measure" style="margin-top:14px"><b>DY PROOF provides an independent technical examination before capital, deployment or acquisition depends on the system.</b></p>
+    <div class="actions"><a class="btn" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20Technical%20due%20diligence" data-request="dd">Request an examination</a></div>
+    <p class="note">Alongside DY Research due diligence, or on its own. The findings are technical; the investment decision stays yours.</p>
+  </div>
+</section>
+
+<!-- ═══ WHY ═════════════════════════════════════════════════════════════ -->
+<section id="why">
+  <div class="wrap">
+    <div class="head center">
+      <span class="eyebrow">Why DY PROOF</span>
+      <h2>Nothing to sell you but the finding.</h2>
+    </div>
+    <div class="prin">
+      <div><h3>Independent</h3><p>No incentive to confirm the conclusion you were hoping for.</p></div>
+      <div><h3>Evidence</h3><p>Every finding is tied to behaviour that was observed and recorded.</p></div>
+      <div><h3>Reproducible</h3><p>Conditions and method are documented, so any result can be re-run.</p></div>
+      <div><h3>Confidential</h3><p>Your system, your data and your results stay private.</p></div>
+      <div><h3>Technical</h3><p>Engineering findings in engineering terms. No management theatre.</p></div>
+    </div>
+    <div class="plain">
+      <div><b>Not a certification.</b><p>No examination issues or implies qualification under any safety or compliance standard.</p></div>
+      <div><b>Not investment advice.</b><p>The findings are technical. What to do with them is your decision.</p></div>
+      <div><b>Not a warranty.</b><p>You receive evidence and reasoning, set out so that they can be checked.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ THE FAMILY ══════════════════════════════════════════════════════ -->
+<section id="family">
+  <div class="wrap">
+    <div class="head center">
+      <span class="eyebrow">The family</span>
+      <h2>Four disciplines. <span class="l2">One standard of evidence.</span></h2>
+      <p class="lead measure">DY PROOF works to the same rule as every surface it belongs with: nothing is claimed that cannot be checked.</p>
+    </div>
+    <div class="stack">
+      <div class="layer here"><span class="verb">Prove</span><span><b>DY PROOF</b><span class="d">Where a running system breaks, located and reproduced.</span></span><span class="go">You are here</span></div>
+      <a class="layer" href="https://dyresearch.github.io/" rel="noopener"><span class="verb">Verify</span><span><b>DY Research</b><span class="d">Technical due diligence: every claim traced to its evidence.</span></span><span class="go">dyresearch.github.io ↗</span></a>
+      <a class="layer" href="https://axonos-bci.github.io/axonos-community-radar/" rel="noopener"><span class="verb">Discover</span><span><b><i class="live" aria-hidden="true"></i>The Radar</b><span class="d">A living map of open neurotech, scored from public evidence.</span></span><span class="go">Radar ↗</span></a>
+      <a class="layer" href="https://axonos.org" rel="noopener"><span class="verb">Build</span><span><b>AxonOS</b><span class="d">The open, deterministic systems layer for brain–computer interfaces.</span></span><span class="go">axonos.org ↗</span></a>
+    </div>
+    <div class="indep"><b>Independence</b><p>Belonging to the family never shapes a finding. If a system under examination competes with AxonOS or builds on it, you are told at scoping — before you commit to anything.</p></div>
+  </div>
+</section>
+
+<!-- ═══ CLOSING ═════════════════════════════════════════════════════════ -->
+<section class="closing" id="start">
+  <div class="wrap center">
+    <span class="eyebrow">Think your system is ready?</span>
+    <h2>Let&#8217;s DY it.</h2>
+    <p class="lead measure">Send one workflow. Get its boundary back in writing — before production finds it for you.</p>
+    <div class="actions">
+      <a class="btn" href="mailto:connect@axonos.org?subject=Examination%20request" data-request="fb">Request an examination</a>
+      <a class="more" href="#engagements">See the engagements</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div><p class="fbrand">DY PROOF</p><p>Independent technology diagnostics.<br>Find the boundary before production does.</p></div>
+      <div><b>Engagements</b><a href="#engagements" data-request="fb">Failure Boundary</a><a href="#engagements" data-request="map">System Boundary Map</a><a href="#engagements" data-request="rt">Runtime Diagnostics</a><a href="#investors">Pre-investment examination</a></div>
+      <div><b>The family</b><a href="https://dyresearch.github.io/" rel="noopener">DY Research ↗</a><a href="https://axonos-bci.github.io/axonos-community-radar/" rel="noopener">Radar ↗</a><a href="https://axonos.org" rel="noopener">AxonOS ↗</a></div>
+      <div><b>Contact</b><a href="mailto:connect@axonos.org">connect@axonos.org</a><a href="https://github.com/DY-Proof" rel="noopener">GitHub</a></div>
+    </div>
+    <div class="fbase"><span>© 2026 DY PROOF · Denis Yermakou</span><span>Don&#8217;t tell us it works. Let&#8217;s DY it.</span></div>
+  </div>
+</footer>
+
+<a class="dock" href="mailto:connect@axonos.org?subject=Examination%20request" data-request="fb" aria-hidden="true" tabindex="-1">Let&#8217;s DY it</a>
+
+<!-- ═══ REQUEST SHEET ═══════════════════════════════════════════════════ -->
+<dialog class="sheet" id="req" aria-labelledby="req-title">
+  <form method="dialog" id="req-form">
+    <div class="sheet-h">
+      <div><h2 id="req-title">Request an examination</h2><p>Scope and a fixed price come back in writing.</p></div>
+      <button class="x" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="field"><span>Engagement</span>
+      <div class="seg" role="radiogroup" aria-label="Engagement">
+        <label><input type="radio" name="tier" value="fb" checked><span>Failure Boundary · $750</span></label>
+        <label><input type="radio" name="tier" value="map"><span>Boundary Map · $3,900</span></label>
+        <label><input type="radio" name="tier" value="rt"><span>Runtime Diagnostics · from $9,500</span></label>
+        <label><input type="radio" name="tier" value="dd"><span>Pre-investment · with the deal</span></label>
+      </div></div>
+    <label class="field"><span>What should be examined?</span>
+      <input name="what" type="text" placeholder="System, workflow or repository"></label>
+    <label class="field"><span>Where do you suspect it breaks?</span>
+      <textarea name="question" placeholder="The workflow, the load it must carry, the symptom you have already seen"></textarea></label>
+    <div class="field"><span>You are</span>
+      <div class="seg" role="radiogroup" aria-label="You are">
+        <label><input type="radio" name="role" value="Founder" checked><span>Founder</span></label>
+        <label><input type="radio" name="role" value="CTO or engineer"><span>CTO or engineer</span></label>
+        <label><input type="radio" name="role" value="Investor"><span>Investor</span></label>
+        <label><input type="radio" name="role" value="Other"><span>Other</span></label>
+      </div></div>
+    <label class="field"><span>Your email</span><input name="email" type="email" autocomplete="email" placeholder="you@company.com"></label>
+    <button class="btn send" type="submit">Send the request</button>
+    <div class="sent" id="req-sent" hidden>
+      <p class="sent-h">Your mail app should now be open with the request.</p>
+      <p class="sent-s">If nothing opened, copy it and send it from anywhere.</p>
+      <div class="sent-ways"><button class="btn" type="button" id="req-copy" style="font-size:15px;padding:11px 18px">Copy the request</button><button class="more" type="button" id="req-addr">Copy the address</button></div>
+      <p class="sent-live" id="req-live" aria-live="polite"></p>
+    </div>
+    <p class="small">Sent to connect@axonos.org. Nothing is stored on this page.</p>
+  </form>
+</dialog>
+
+<script>
+(function () {
+  "use strict";
+  document.documentElement.classList.add("js");
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ── the instrument ───────────────────────────────────────────────────
+  // One illustrative workflow. p99 latency in seconds against concurrent
+  // sessions: flat, then a knee, then unbounded. The same numbers appear in
+  // the specimen report, so the page tells one story.
+  var N0 = 1, N1 = 12, YMAX = 6, BUDGET = 2.0, BOUND = 8;
+  function lat(n) { return 0.55 + 0.04 * n + 1.13 * Math.exp(0.84 * (n - 8)); }
+  function thr(n) { return Math.max(0, Math.round(6 * n / lat(n) * (n > 8 ? Math.max(0.05, 1 - 0.3 * (n - 8)) : 1))); }
+  function err(n) { return n <= 8 ? 0 : Math.min(97, Math.round(4 * Math.pow(n - 8, 1.6))); }
+  function X(n) { return (n - N0) / (N1 - N0) * 1000; }
+  function Y(s) { return 1000 - Math.min(s, YMAX * 1.2) / YMAX * 1000; }
+  function state(n) {
+    var k = Math.round(n);
+    if (k <= 5) return ["stable", "Stable", "Latency flat, queues empty. Every request answered inside the budget."];
+    if (k < BOUND) return ["degraded", "Degraded", "The tail is rising and the connection pool is filling. Still inside the budget."];
+    if (k === BOUND) return ["boundary", "Boundary", "The last load the workflow holds. p99 sits on its 2.0 s budget."];
+    return ["failure", "Failure", "Retries queue behind the requests they retry. Latency does not come back."];
+  }
+  var inst = document.getElementById("inst");
+  if (inst) {
+    var svg = document.getElementById("plotsvg"), NS = "http://www.w3.org/2000/svg";
+    function el(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; }
+    // zones
+    var zones = document.getElementById("zones");
+    el("rect", { x: 0, y: 0, width: X(5.5), height: 1000, fill: "rgba(52,211,153,.045)" }, zones);
+    el("rect", { x: X(5.5), y: 0, width: X(BOUND) - X(5.5), height: 1000, fill: "rgba(255,179,64,.06)" }, zones);
+    el("rect", { x: X(BOUND), y: 0, width: 1000 - X(BOUND), height: 1000, fill: "rgba(255,69,58,.065)" }, zones);
+    // grid and y labels
+    var grid = document.getElementById("grid"), ylabs = document.getElementById("ylabs");
+    [0, 1, 2, 3, 4, 5, 6].forEach(function (s) {
+      if (s === BUDGET) return;
+      el("line", { x1: 0, x2: 1000, y1: Y(s), y2: Y(s), "class": "grid-l", "vector-effect": "non-scaling-stroke" }, grid);
+    });
+    el("line", { x1: 0, x2: 1000, y1: Y(BUDGET), y2: Y(BUDGET), "class": "budget", "vector-effect": "non-scaling-stroke" }, grid);
+    [0, 2, 4, 6].forEach(function (s) {
+      var l = document.createElement("span"); l.className = "ylab"; l.style.top = (Y(s) / 10) + "%"; l.textContent = s + " s"; ylabs.appendChild(l);
+    });
+    document.getElementById("blabel").style.top = (Y(BUDGET) / 10) + "%";
+    var zls = document.getElementById("zls"), zld = document.getElementById("zld"), zlf = document.getElementById("zlf");
+    zls.style.left = (X(3.25) / 10) + "%"; zld.style.left = (X((5.5 + BOUND) / 2) / 10) + "%"; zlf.style.left = (X(10.9) / 10) + "%";
+    // x labels
+    var xl = document.getElementById("xlabs");
+    for (var i = N0; i <= N1; i++) { var s = document.createElement("span"); s.textContent = i; if (i % 2 === 0 && i !== BOUND && i !== N1) s.className = "odd"; xl.appendChild(s); }
+    // curve
+    var d = "", g = "";
+    for (var n = N0; n <= N1 + 1e-9; n += 0.05) {
+      var y = Y(lat(n)); if (lat(n) > YMAX * 1.04) { d += (d ? " L" : "M") + X(n).toFixed(1) + "," + Y(YMAX * 1.04).toFixed(1); break; }
+      d += (d ? " L" : "M") + X(n).toFixed(1) + "," + y.toFixed(1);
+    }
+    document.getElementById("curve").setAttribute("d", d);
+    document.getElementById("ghost").setAttribute("d", d);
+    // error bars
+    var errs = document.getElementById("errs");
+    for (var k = BOUND + 1; k <= N1; k++) { var h = err(k) / 100 * 360; el("rect", { x: X(k) - 12, y: 1000 - h, width: 24, height: h, "class": "err" }, errs); }
+    document.getElementById("mark").style.left = (X(BOUND) / 10) + "%";
+
+    var probe = document.getElementById("probe"), pline = document.getElementById("pline"), revealR = document.getElementById("revealR");
+    var range = document.getElementById("load"), out = document.getElementById("loadOut");
+    var rState = document.getElementById("rState"), rWhy = document.getElementById("rWhy");
+    var rLat = document.getElementById("rLat"), rThr = document.getElementById("rThr"), rErr = document.getElementById("rErr");
+    range.style.setProperty("--s1", ((5.5 - N0) / (N1 - N0) * 100) + "%");
+    range.style.setProperty("--s2", ((BOUND + 0.5 - N0) / (N1 - N0) * 100) + "%");
+    var lastKey = "";
+    function fmtLat(s) { return s >= 30 ? "timeout" : s < 1 ? Math.round(s * 1000) + "<small>ms</small>" : s.toFixed(s < 10 ? 2 : 1) + "<small>s</small>"; }
+    function show(n, drawTo) {
+      var s = lat(n), top = s > YMAX;
+      var px = X(n) / 10, py = (top ? 0 : Y(s) / 10);
+      probe.style.left = px + "%"; probe.style.top = py + "%"; pline.style.left = px + "%";
+      probe.classList.toggle("up", top);
+      revealR.setAttribute("width", drawTo == null ? 1000 : Math.max(0, X(drawTo) + 2));
+      var k = Math.round(n), st = state(n);
+      out.textContent = k;
+      rLat.innerHTML = fmtLat(lat(k)); rThr.innerHTML = thr(k) + "<small>req/s</small>"; rErr.innerHTML = err(k) + "<small>%</small>";
+      if (st[0] !== lastKey) {
+        rState.className = "v st-" + st[0]; rState.lastChild.textContent = st[1]; rWhy.textContent = st[2];
+        probe.style.background = st[0] === "stable" ? "#fff" : st[0] === "degraded" ? "#ffd08a" : st[0] === "boundary" ? "#9be8ff" : "#ff8a80";
+        lastKey = st[0];
+      }
+      range.setAttribute("aria-valuetext", k + " sessions, p99 " + (lat(k) >= 30 ? "timeout" : lat(k).toFixed(2) + " seconds") + ", " + st[1].toLowerCase());
+    }
+    var raf = 0, swept = false;
+    function found() { inst.classList.add("found"); }
+    function sweep() {
+      cancelAnimationFrame(raf); inst.classList.remove("found");
+      var t0 = null, D1 = 4200, D2 = 900;
+      function frame(t) {
+        if (t0 === null) t0 = t;
+        var e = t - t0;
+        if (e < D1) { var p = e / D1; p = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; var n = N0 + (N1 - N0) * p; show(n, n); range.value = Math.round(n); raf = requestAnimationFrame(frame); return; }
+        if (e < D1 + D2) { var q = (e - D1) / D2; q = 1 - Math.pow(1 - q, 3); var m = N1 - (N1 - BOUND) * q; show(m, null); range.value = Math.round(m); if (q > .35) found(); raf = requestAnimationFrame(frame); return; }
+        show(BOUND, null); range.value = BOUND; found();
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    range.addEventListener("input", function () { cancelAnimationFrame(raf); show(+range.value, null); found(); swept = true; });
+    document.getElementById("replay").addEventListener("click", function () { swept = true; if (reduce) { show(BOUND, null); range.value = BOUND; found(); } else sweep(); });
+    if (reduce || !("IntersectionObserver" in window)) { show(BOUND, null); range.value = BOUND; found(); }
+    else {
+      show(N0, N0);
+      var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting && !swept) { swept = true; sweep(); io.disconnect(); } }); }, { threshold: .45 });
+      io.observe(inst);
+    }
+  }
+
+  // ── the request sheet ────────────────────────────────────────────────
+  var TIERS = { fb: ["Failure Boundary", "$750"], map: ["System Boundary Map", "$3,900"], rt: ["Runtime Diagnostics", "from $9,500"], dd: ["Pre-investment examination", "scoped with the deal"] };
+  var dlg = document.getElementById("req"), form = document.getElementById("req-form");
+  var canModal = dlg && typeof dlg.showModal === "function";
+  function val(n) { var e = form.querySelector('input[name="' + n + '"]:checked') || form.querySelector('[name="' + n + '"]'); return e ? e.value : ""; }
+  if (canModal) {
+    document.querySelectorAll("[data-request]").forEach(function (a) {
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        var r = form.querySelector('input[name="tier"][value="' + a.getAttribute("data-request") + '"]'); if (r) r.checked = true;
+        if (a.getAttribute("data-request") === "dd") { var inv = form.querySelector('input[name="role"][value="Investor"]'); if (inv) inv.checked = true; }
+        dlg.showModal(); var f = form.querySelector('input[name="what"]'); if (f) f.focus();
+      });
+    });
+    dlg.querySelector("[data-close]").addEventListener("click", function () { dlg.close(); });
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+    var sent = document.getElementById("req-sent"), live = document.getElementById("req-live"), last = "";
+    function copy(text, done) {
+      function ok() { live.textContent = done; }
+      function fallback() {
+        var ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.className = "offscreen";
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); ok(); } catch (e) { live.textContent = "Select and copy: " + text.slice(0, 80); }
+        document.body.removeChild(ta);
+      }
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(ok, fallback); else fallback();
+    }
+    document.getElementById("req-copy").addEventListener("click", function () { copy(last, "Copied. Paste it into any email or message."); });
+    document.getElementById("req-addr").addEventListener("click", function () { copy("connect@axonos.org", "Copied: connect@axonos.org"); });
+    dlg.addEventListener("close", function () { dlg.classList.remove("is-sent"); sent.hidden = true; live.textContent = ""; });
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var t = TIERS[val("tier")] || TIERS.fb;
+      var body = ["Engagement: " + t[0] + " (" + t[1] + ")", "Examine: " + (val("what") || "—"), "Where I suspect it breaks: " + (val("question") || "—"),
+        "I am: " + val("role"), "Reply to: " + (val("email") || "—"), "", "Sent from dy-proof.github.io"].join("\n");
+      var subject = "Examination request — " + t[0];
+      last = "To: connect@axonos.org\nSubject: " + subject + "\n\n" + body;
+      window.location.href = "mailto:connect@axonos.org?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+      dlg.classList.add("is-sent"); sent.hidden = false;
+    });
+  }
+
+  // ── the dock: shown once the hero has scrolled away ──────────────────
+  var dock = document.querySelector(".dock"), hero = document.getElementById("top");
+  if (dock && hero && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (es) { es.forEach(function (x) { var on = !x.isIntersecting; dock.classList.toggle("show", on); dock.setAttribute("aria-hidden", on ? "false" : "true"); dock.tabIndex = on ? 0 : -1; }); }, { threshold: 0 }).observe(hero);
+  }
+})();
+</script>
+</body>
+</html>
