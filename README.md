@@ -1,16 +1,24 @@
 <div align="center">
 
-# DY PROOF
+# DY │ PROOF
 
 **Independent technology diagnostics.** Find where your system breaks — before production does.
 
-**[dy-proof.github.io](https://dy-proof.github.io)** · **[Engagements](https://dy-proof.github.io/#engagements)** · **[The specimen report](https://dy-proof.github.io/#report)** · [connect@axonos.org](mailto:connect@axonos.org)
+**[Board](https://dy-proof.github.io)** · **[Bench](https://dy-proof.github.io/bench/)** · **[Engagements](https://dy-proof.github.io/#engagements)** · [connect@axonos.org](mailto:connect@axonos.org)
 
 </div>
 
-This repository is the site: one self-contained page, `index.html`, and its link
-preview, `og.jpg`. There is no build step, and the page makes no third-party
-requests. Every figure on it is illustrative and says so.
+The site has two readings of the same examination, switched by a knob in the
+navigation, the way an oscilloscope switches its display mode:
+
+| Reading | For | Where |
+|:--|:--|:--|
+| **Board** | founders, owners and institutional investors — the decision | [`/`](https://dy-proof.github.io) · `index.html` |
+| **Bench** | engineers — the data, printed as terminal output | [`/bench/`](https://dy-proof.github.io/bench/) · `bench/index.html` |
+
+Turning the knob keeps the reader on the same topic. Both pages are
+self-contained, with no build step and no third-party requests. Every figure on
+them is illustrative and says so.
 
 ---
 
