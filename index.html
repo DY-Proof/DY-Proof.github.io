@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DY PROOF · site v1.2.1 · Board · SPDX-FileCopyrightText: 2026 Denis Yermakou -->
+<!-- DY PROOF · site v1.3.0 · Board · SPDX-FileCopyrightText: 2026 Denis Yermakou -->
 <html lang="en" data-edition="board">
 <head>
 <meta charset="utf-8">
@@ -813,11 +813,11 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
       <article class="plan featured">
         <div class="row-top"><span class="when">72 hours</span><span class="badge">Start here</span></div>
         <span class="name">Failure Boundary</span>
-        <span class="price">$750</span>
+        <span class="price">$950</span>
         <span class="q">Where does one critical workflow stop behaving acceptably?</span>
         <ul><li>One critical workflow</li><li>One load axis, raised step by step</li><li>The boundary and its mechanism</li><li>Written result. No meetings.</li>
           <li class="plus">The fee is credited in full toward the Boundary Map if you continue within 30 days.</li></ul>
-        <div class="foot"><a class="btn" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20Failure%20Boundary" data-request="fb">Let&#8217;s DY it</a></div>
+        <div class="foot"><a class="btn" href="/failure-boundary/">Let&#8217;s DY it</a></div>
       </article>
       <article class="plan">
         <div class="row-top"><span class="when">7 working days</span></div>
@@ -842,7 +842,7 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
         <p>Runtime evidence for a deal: the target&#8217;s system examined under load before capital depends on it. Runs alongside DY Research due diligence — one scope, one report — or on its own.</p></div>
       <div class="side"><b>Scoped with the deal</b><a class="btn" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20Pre-investment%20examination" data-request="dd">Request an examination</a></div>
     </div>
-    <div class="terms"><span>Scope and price agreed in writing</span><span>Nothing invoiced until the scope is agreed</span><span>Your system and results stay private</span></div>
+    <div class="terms"><span>Scope and price agreed in writing</span><span>Nothing invoiced until the scope is agreed</span><span>Your system and results stay private</span><span>Bank transfer or DOGE · <a href="/failure-boundary/#pay">how to pay</a></span></div>
 
     <p class="subhead">DY PROOF or DY Research?</p>
     <div class="which">
@@ -946,7 +946,7 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
     </div>
     <div class="field"><span>Engagement</span>
       <div class="seg" role="radiogroup" aria-label="Engagement">
-        <label><input type="radio" name="tier" value="fb" checked><span>Failure Boundary · $750</span></label>
+        <label><input type="radio" name="tier" value="fb" checked><span>Failure Boundary · $950</span></label>
         <label><input type="radio" name="tier" value="map"><span>Boundary Map · $3,900</span></label>
         <label><input type="radio" name="tier" value="rt"><span>Runtime Diagnostics · from $9,500</span></label>
         <label><input type="radio" name="tier" value="dd"><span>Pre-investment · with the deal</span></label>
@@ -1084,7 +1084,7 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
   }
 
   // ── the request sheet ────────────────────────────────────────────────
-  var TIERS = { fb: ["Failure Boundary", "$750"], map: ["System Boundary Map", "$3,900"], rt: ["Runtime Diagnostics", "from $9,500"], dd: ["Pre-investment examination", "scoped with the deal"] };
+  var TIERS = { fb: ["Failure Boundary", "$950"], map: ["System Boundary Map", "$3,900"], rt: ["Runtime Diagnostics", "from $9,500"], dd: ["Pre-investment examination", "scoped with the deal"] };
   var dlg = document.getElementById("req"), form = document.getElementById("req-form");
   var canModal = dlg && typeof dlg.showModal === "function";
   function val(n) { var e = form.querySelector('input[name="' + n + '"]:checked') || form.querySelector('[name="' + n + '"]'); return e ? e.value : ""; }
