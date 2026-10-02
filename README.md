@@ -2,6 +2,8 @@
 
 # DY │ PROOF
 
+[![AxonOS Radar](https://img.shields.io/badge/AxonOS%20Radar-open%20neurotech%20map-ffffff?style=flat-square&labelColor=000000)](https://axonos-bci.github.io/axonos-community-radar/)
+
 **Independent technology diagnostics.** Find where your system breaks — before production does.
 
 **[Board](https://dy-proof.github.io)** · **[Bench](https://dy-proof.github.io/bench/)** · **[Failure Boundary](https://dy-proof.github.io/failure-boundary/)** · **[Engagements](https://dy-proof.github.io/#engagements)** · [connect@axonos.org](mailto:connect@axonos.org)
