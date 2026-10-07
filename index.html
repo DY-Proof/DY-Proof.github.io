@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DY PROOF · site v1.3.0 · Board · SPDX-FileCopyrightText: 2026 Denis Yermakou -->
+<!-- DY PROOF · site v1.4.0 · Board · SPDX-FileCopyrightText: 2026 Denis Yermakou -->
 <html lang="en" data-edition="board">
 <head>
 <meta charset="utf-8">
@@ -575,6 +575,7 @@ html.dyk-out .dyk-veil .dyk-here{display:none!important}
 .dyk-veil{--dyk-vbg:#fff;--dyk-vfg:#000;--dyk-beam:#000;--dyk-beamglow:0 0 0 rgba(0,0,0,0);
   --dyk-vfont:"Inter","Helvetica Neue",Helvetica,Arial,sans-serif;--dyk-vsub:400 12px/1.4 ui-monospace,"JetBrains Mono",Menlo,monospace}
 html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;--dyk-beam:#2dd4ff;--dyk-beamglow:0 0 18px 2px rgba(45,212,255,.75);--dyk-vfont:var(--sans);--dyk-vsub:400 15px/1.4 var(--sans)}
+.plan .price.por{font-size:34px;letter-spacing:-.035em;color:var(--text-2,#a1a1a6);margin:22px 0 16px}
 </style>
 </head>
 <body>
@@ -813,7 +814,7 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
       <article class="plan featured">
         <div class="row-top"><span class="when">72 hours</span><span class="badge">Start here</span></div>
         <span class="name">Failure Boundary</span>
-        <span class="price">$950</span>
+        <span class="price por">On request</span>
         <span class="q">Where does one critical workflow stop behaving acceptably?</span>
         <ul><li>One critical workflow</li><li>One load axis, raised step by step</li><li>The boundary and its mechanism</li><li>Written result. No meetings.</li>
           <li class="plus">The fee is credited in full toward the Boundary Map if you continue within 30 days.</li></ul>
@@ -822,7 +823,7 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
       <article class="plan">
         <div class="row-top"><span class="when">7 working days</span></div>
         <span class="name">System Boundary Map</span>
-        <span class="price">$3,900</span>
+        <span class="price por">On request</span>
         <span class="q">How far can the whole system go, and what gives way first?</span>
         <ul><li>Up to five critical workflows</li><li>All five dimensions, measured</li><li>The operating envelope, workflow by workflow</li><li>One re-examination after your fix</li></ul>
         <div class="foot"><a class="btn ghost" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20System%20Boundary%20Map" data-request="map">Request an examination</a></div>
@@ -830,7 +831,7 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
       <article class="plan">
         <div class="row-top"><span class="when">2&#8211;3 weeks</span></div>
         <span class="name">Runtime Diagnostics</span>
-        <span class="price"><small>from</small>$9,500</span>
+        <span class="price por">On request</span>
         <span class="q">Why does it break, and does the fix really move the boundary?</span>
         <ul><li>Scheduling, jitter and determinism</li><li>Mechanisms traced to their cause in code</li><li>Every fix verified by re-examination</li><li>The harness is yours, to run in your CI</li></ul>
         <div class="foot"><a class="btn ghost" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20Runtime%20Diagnostics" data-request="rt">Request an examination</a></div>
@@ -941,14 +942,14 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
 <dialog class="sheet" id="req" aria-labelledby="req-title">
   <form method="dialog" id="req-form">
     <div class="sheet-h">
-      <div><h2 id="req-title">Request an examination</h2><p>Scope and a fixed price come back in writing.</p></div>
+      <div><h2 id="req-title">Request an examination</h2><p>Scope and price come back in writing.</p></div>
       <button class="x" type="button" data-close aria-label="Close">×</button>
     </div>
     <div class="field"><span>Engagement</span>
       <div class="seg" role="radiogroup" aria-label="Engagement">
-        <label><input type="radio" name="tier" value="fb" checked><span>Failure Boundary · $950</span></label>
-        <label><input type="radio" name="tier" value="map"><span>Boundary Map · $3,900</span></label>
-        <label><input type="radio" name="tier" value="rt"><span>Runtime Diagnostics · from $9,500</span></label>
+        <label><input type="radio" name="tier" value="fb" checked><span>Failure Boundary</span></label>
+        <label><input type="radio" name="tier" value="map"><span>Boundary Map</span></label>
+        <label><input type="radio" name="tier" value="rt"><span>Runtime Diagnostics</span></label>
         <label><input type="radio" name="tier" value="dd"><span>Pre-investment · with the deal</span></label>
       </div></div>
     <label class="field"><span>What should be examined?</span>
@@ -1084,7 +1085,7 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
   }
 
   // ── the request sheet ────────────────────────────────────────────────
-  var TIERS = { fb: ["Failure Boundary", "$950"], map: ["System Boundary Map", "$3,900"], rt: ["Runtime Diagnostics", "from $9,500"], dd: ["Pre-investment examination", "scoped with the deal"] };
+  var TIERS = { fb: ["Failure Boundary", "pricing on request"], map: ["System Boundary Map", "pricing on request"], rt: ["Runtime Diagnostics", "pricing on request"], dd: ["Pre-investment examination", "scoped with the deal"] };
   var dlg = document.getElementById("req"), form = document.getElementById("req-form");
   var canModal = dlg && typeof dlg.showModal === "function";
   function val(n) { var e = form.querySelector('input[name="' + n + '"]:checked') || form.querySelector('[name="' + n + '"]'); return e ? e.value : ""; }
