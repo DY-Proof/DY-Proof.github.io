@@ -22,7 +22,7 @@ One engagement has its own entry page, written for the engineers who buy it:
 
 | Page | For | Where |
 |:--|:--|:--|
-| **Failure Boundary** | one critical execution path — 72 hours, pricing on request, how to start and pay | [`/failure-boundary/`](https://dy-proof.github.io/failure-boundary/) · `failure-boundary/index.html` |
+| **Failure Boundary** | one critical execution path — 72 hours, how to start and pay | [`/failure-boundary/`](https://dy-proof.github.io/failure-boundary/) · `failure-boundary/index.html` |
 
 Turning the knob keeps the reader on the same topic. Both pages are
 self-contained, with no build step and no third-party requests. Every figure on

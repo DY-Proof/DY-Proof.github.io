@@ -609,7 +609,7 @@ DETERMINISM ───────┘</pre>
 <!-- ═══ 06 · ENGAGEMENTS ════════════════════════════════════════════════
      The ladder: where one workflow breaks, how far the whole system goes,
      why it breaks and whether the fix holds. DY Research verifies what is
-     claimed; DY PROOF produces new evidence under load. No price is shared. -->
+     claimed; DY PROOF produces new evidence under load. -->
 <section id="engagements">
   <div class="wrap">
     <div class="grid">
@@ -623,23 +623,23 @@ DETERMINISM ───────┘</pre>
       <li class="first"><span class="n">01</span><span class="nm">Failure Boundary<span>72 HOURS</span></span>
         <span class="q">Where does one critical workflow stop behaving acceptably?</span>
         <span class="sc">One workflow, one load axis, raised step by step. The boundary and its mechanism. A written result, no meetings.</span>
-        <span class="pr"><b class="por">On request</b><a class="btn sm" href="/failure-boundary/">Let&#8217;s DY it</a></span></li>
+        <span class="pr"><b class="por">One verdict</b><a class="btn sm" href="/failure-boundary/">Let&#8217;s DY it</a></span></li>
       <li><span class="n">02</span><span class="nm">System Boundary Map<span>7 WORKING DAYS</span></span>
         <span class="q">How far can the whole system go, and what gives way first?</span>
         <span class="sc">Up to five critical workflows across all five dimensions. The operating envelope, workflow by workflow. One re-examination after your fix.</span>
-        <span class="pr"><b class="por">On request</b><a class="btn sm line" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20System%20Boundary%20Map" data-request="map">Request</a></span></li>
+        <span class="pr"><b class="por">The envelope</b><a class="btn sm line" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20System%20Boundary%20Map" data-request="map">Request</a></span></li>
       <li><span class="n">03</span><span class="nm">Runtime Diagnostics<span>2–3 WEEKS</span></span>
         <span class="q">Why does it break, and does the fix really move the boundary?</span>
         <span class="sc">Scheduling, jitter and determinism. Mechanisms traced to their cause in code. Every fix verified by re-examination. The harness is yours, to run in your CI.</span>
-        <span class="pr"><b class="por">On request</b><a class="btn sm line" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20Runtime%20Diagnostics" data-request="rt">Request</a></span></li>
+        <span class="pr"><b class="por">The cause, fixed</b><a class="btn sm line" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20Runtime%20Diagnostics" data-request="rt">Request</a></span></li>
       <li id="pre"><span class="n">—</span><span class="nm">Pre-investment examination<span>PRIVATE</span></span>
         <span class="q">Where does the target&#8217;s system break, before capital depends on it?</span>
         <span class="sc">Runtime evidence for a deal. Runs alongside DY Research due diligence — one scope, one report — or on its own.</span>
         <span class="pr"><b class="w">Scoped with the deal</b><a class="btn sm line" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20Pre-investment%20examination" data-request="dd">Request</a></span></li>
     </ol>
     <div class="fine">
-      <p>The 72-hour fee is credited in full toward the Boundary Map if you continue within 30 days.</p>
-      <p>Scope and price agreed in writing. Nothing invoiced until the scope is agreed. Your system and results stay private.</p>
+      <p>Everything the 72-hour examination finds carries into the Boundary Map if you continue.</p>
+      <p>Scope agreed in writing. Nothing begins until the scope is agreed. Your system and results stay private.</p>
       <p>Payment by bank transfer or DOGE. <a href="/failure-boundary/#pay">How to start and pay</a>.</p>
     </div>
 
@@ -651,9 +651,8 @@ DETERMINISM ───────┘</pre>
           <div><span class="k">QUESTION</span><span>Where does the running system stop working?</span><span class="dr">Is what is claimed true?</span></div>
           <div><span class="k">METHOD</span><span>Produces new evidence under controlled load</span><span class="dr">Reads the evidence that exists: code, tests, proofs</span></div>
           <div><span class="k">ENDS IN</span><span>A documented, reproducible boundary</span><span class="dr">A written verdict</span></div>
-          <div><span class="k">PRICING</span><span>On request</span><span class="dr">On request</span></div>
         </div>
-        <p class="cap" style="margin-top:18px">Different questions, one standard of evidence, pricing on request for both. For a deal, the two run as one engagement.</p>
+        <p class="cap" style="margin-top:18px">Different questions, one standard of evidence. For a deal, the two run as one engagement.</p>
       </div>
     </div>
   </div>
@@ -774,7 +773,7 @@ L1  INFRASTRUCTURE  AxonOS
 <dialog class="sheet" id="req" aria-labelledby="req-title">
   <form method="dialog" id="req-form">
     <div class="sheet-h">
-      <div><h2 id="req-title">Request an examination</h2><p>Scope and price come back in writing.</p></div>
+      <div><h2 id="req-title">Request an examination</h2><p>The scope comes back in writing.</p></div>
       <button class="x" type="button" data-close aria-label="Close">×</button>
     </div>
     <div class="field"><span>ENGAGEMENT</span>
@@ -951,7 +950,7 @@ L1  INFRASTRUCTURE  AxonOS
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(start); else start();
 
   // ── the request sheet ────────────────────────────────────────────────
-  var TIERS = { fb: ["Failure Boundary", "pricing on request"], map: ["System Boundary Map", "pricing on request"], rt: ["Runtime Diagnostics", "pricing on request"], dd: ["Pre-investment examination", "scoped with the deal"] };
+  var TIERS = { fb: ["Failure Boundary", "72 hours"], map: ["System Boundary Map", "7 working days"], rt: ["Runtime Diagnostics", "2–3 weeks"], dd: ["Pre-investment examination", "scoped with the deal"] };
   var dlg = document.getElementById("req"), form = document.getElementById("req-form");
   function val(n) { var e = form.querySelector('input[name="' + n + '"]:checked') || form.querySelector('[name="' + n + '"]'); return e ? e.value : ""; }
   if (dlg && typeof dlg.showModal === "function") {

@@ -286,13 +286,13 @@ section.paper{background:var(--paper);color:var(--ink);border-top:0}
 
 /* ── engagements ───────────────────────────────────────────────────────── */
 .plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
-.plan{display:grid;grid-template-rows:auto auto auto auto 1fr auto;background:var(--panel);border:1px solid var(--hair);border-radius:var(--r);
+.plan{display:grid;grid-template-rows:auto auto auto 1fr auto;background:var(--panel);border:1px solid var(--hair);border-radius:var(--r);
   padding:34px 30px 30px;position:relative;transition:transform .45s var(--ease),box-shadow .45s var(--ease)}
 .plan.featured{border-color:rgba(45,212,255,.45);background:linear-gradient(180deg,#0b1a20,var(--panel) 40%)}
 .plan .row-top{display:flex;justify-content:space-between;align-items:center;height:26px;margin-bottom:18px}
 .plan .when{font:500 12.5px/1 var(--mono);color:var(--text-3)}
 .plan .badge{font-size:11.5px;font-weight:600;color:var(--accent);border:1px solid rgba(45,212,255,.4);border-radius:980px;padding:5px 10px;white-space:nowrap}
-.plan .name{display:block;font-size:22px;font-weight:700;letter-spacing:-.025em;min-height:28px}
+.plan .name{display:block;font-size:22px;font-weight:700;letter-spacing:-.025em;min-height:28px;margin-bottom:16px}
 .plan .price{display:block;font-size:54px;font-weight:700;letter-spacing:-.045em;line-height:1;margin:14px 0 14px;font-variant-numeric:tabular-nums}
 .plan .price small{font-size:22px;letter-spacing:-.02em;color:var(--text-2);margin-right:6px;font-weight:600}
 .plan .q{display:block;font-size:15.5px;line-height:1.45;color:var(--text);min-height:4.4em}
@@ -797,7 +797,7 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
      The ladder: where one workflow breaks, how far the whole system goes,
      why it breaks and whether the fix holds. Each step answers one question
      and leads to the next only if it is needed. DY Research verifies what is
-     claimed; DY PROOF produces new evidence under load. No price is shared. -->
+     claimed; DY PROOF produces new evidence under load. -->
 <section id="engagements">
   <div class="wrap">
     <div class="head center">
@@ -814,16 +814,14 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
       <article class="plan featured">
         <div class="row-top"><span class="when">72 hours</span><span class="badge">Start here</span></div>
         <span class="name">Failure Boundary</span>
-        <span class="price por">On request</span>
         <span class="q">Where does one critical workflow stop behaving acceptably?</span>
         <ul><li>One critical workflow</li><li>One load axis, raised step by step</li><li>The boundary and its mechanism</li><li>Written result. No meetings.</li>
-          <li class="plus">The fee is credited in full toward the Boundary Map if you continue within 30 days.</li></ul>
+          <li class="plus">Everything it finds carries into the Boundary Map if you continue.</li></ul>
         <div class="foot"><a class="btn" href="/failure-boundary/">Let&#8217;s DY it</a></div>
       </article>
       <article class="plan">
         <div class="row-top"><span class="when">7 working days</span></div>
         <span class="name">System Boundary Map</span>
-        <span class="price por">On request</span>
         <span class="q">How far can the whole system go, and what gives way first?</span>
         <ul><li>Up to five critical workflows</li><li>All five dimensions, measured</li><li>The operating envelope, workflow by workflow</li><li>One re-examination after your fix</li></ul>
         <div class="foot"><a class="btn ghost" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20System%20Boundary%20Map" data-request="map">Request an examination</a></div>
@@ -831,7 +829,6 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
       <article class="plan">
         <div class="row-top"><span class="when">2&#8211;3 weeks</span></div>
         <span class="name">Runtime Diagnostics</span>
-        <span class="price por">On request</span>
         <span class="q">Why does it break, and does the fix really move the boundary?</span>
         <ul><li>Scheduling, jitter and determinism</li><li>Mechanisms traced to their cause in code</li><li>Every fix verified by re-examination</li><li>The harness is yours, to run in your CI</li></ul>
         <div class="foot"><a class="btn ghost" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20Runtime%20Diagnostics" data-request="rt">Request an examination</a></div>
@@ -843,7 +840,7 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
         <p>Runtime evidence for a deal: the target&#8217;s system examined under load before capital depends on it. Runs alongside DY Research due diligence — one scope, one report — or on its own.</p></div>
       <div class="side"><b>Scoped with the deal</b><a class="btn" href="mailto:connect@axonos.org?subject=Examination%20request%20%E2%80%94%20Pre-investment%20examination" data-request="dd">Request an examination</a></div>
     </div>
-    <div class="terms"><span>Scope and price agreed in writing</span><span>Nothing invoiced until the scope is agreed</span><span>Your system and results stay private</span><span>Bank transfer or DOGE · <a href="/failure-boundary/#pay">how to pay</a></span></div>
+    <div class="terms"><span>Scope agreed in writing</span><span>Nothing begins until the scope is agreed</span><span>Your system and results stay private</span><span>Bank transfer or DOGE · <a href="/failure-boundary/#pay">how to pay</a></span></div>
 
     <p class="subhead">DY PROOF or DY Research?</p>
     <div class="which">
@@ -942,7 +939,7 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
 <dialog class="sheet" id="req" aria-labelledby="req-title">
   <form method="dialog" id="req-form">
     <div class="sheet-h">
-      <div><h2 id="req-title">Request an examination</h2><p>Scope and price come back in writing.</p></div>
+      <div><h2 id="req-title">Request an examination</h2><p>The scope comes back in writing.</p></div>
       <button class="x" type="button" data-close aria-label="Close">×</button>
     </div>
     <div class="field"><span>Engagement</span>
@@ -1085,7 +1082,7 @@ html.dyk-cover .dyk-veil,html.dyk-in .dyk-veil{--dyk-vbg:#000;--dyk-vfg:#f5f5f7;
   }
 
   // ── the request sheet ────────────────────────────────────────────────
-  var TIERS = { fb: ["Failure Boundary", "pricing on request"], map: ["System Boundary Map", "pricing on request"], rt: ["Runtime Diagnostics", "pricing on request"], dd: ["Pre-investment examination", "scoped with the deal"] };
+  var TIERS = { fb: ["Failure Boundary", "72 hours"], map: ["System Boundary Map", "7 working days"], rt: ["Runtime Diagnostics", "2–3 weeks"], dd: ["Pre-investment examination", "scoped with the deal"] };
   var dlg = document.getElementById("req"), form = document.getElementById("req-form");
   var canModal = dlg && typeof dlg.showModal === "function";
   function val(n) { var e = form.querySelector('input[name="' + n + '"]:checked') || form.querySelector('[name="' + n + '"]'); return e ? e.value : ""; }
